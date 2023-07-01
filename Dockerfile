@@ -10,14 +10,13 @@ RUN source ./${ENV_NAME}/bin/activate
 
 RUN pip install --upgrade pip 
 
-# Copying Project dependencies inside the directory 
-
 COPY ./src ./
 COPY ./unittests ./
-COPY ./entrypoint.sh ./
 COPY ./module_requirements.txt ./
-COPY ./module_constraints ./
+COPY ./entrypoint.sh ./
 
-# Allowing Access for running shell deployment script 
-RUN chmod +x ./entrypoint.sh 
+RUN pip freeze > module_requirements.txt
+RUN pip install -r module_requirements.txt -c ./module_constraints.txt
+RUN chmod +x ./entrypoint.sh
+
 ENTRYPOINT ["sh", "./entrypoint.sh"]
