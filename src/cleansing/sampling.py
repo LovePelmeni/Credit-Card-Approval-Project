@@ -1,7 +1,5 @@
 import typing, logging
 from imblearn.over_sampling import RandomOverSampler, SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-from sklearn.metrics import precision_score
 import pandas 
 import constants 
 
