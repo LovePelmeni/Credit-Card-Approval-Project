@@ -1,19 +1,23 @@
 import pydantic
 import pandas 
-from sklearn.preprocessing import StandardScaler, LabelEncoder 
+from sklearn.preprocessing import StandardScaler 
 
 class CardApprovalFeatures(pydantic.BaseModel):
+
     """
     Class Form represents set of features for predicting card approval status
-    Args:
-        age: feature, representing age of the client 
-        job: feature, represening current job of the client 
-        credit_window: feature, representing credit window of the client
     """
-    age: float
-    job: str
-    credit_window: float
-        
+    
+    def get_dataframe(self) -> pandas.DataFrame:
+        """
+        Function converts model to pandas.DataFrame object
+        """
+        return pandas.DataFrame(
+            {
+                feature: [value] for feature, value in self.__dict__().items()
+            }
+        )
+    
     def encoded_data(self) -> pandas.DataFrame:
         """
         Function encodes feature data 
@@ -26,9 +30,10 @@ class CardApprovalFeatures(pydantic.BaseModel):
         Returns:
             pandas.DataFrame object, containing encoded data
         """
-        enc_job = self.__encode_job()
-        st_data = self.__standardize_numeric_features()
-        enc_data = pandas.concat([enc_job, st_data], axis=1)
+        enc_numeric = self.__standardize_numeric_features()
+        enc_categories = self.__encode_categorical_features()
+
+        enc_data = pandas.concat([enc_categories, enc_numeric], axis=1)
         return enc_data
         
     def __standardize_numeric_features(self) -> pandas.DataFrame:
@@ -40,19 +45,16 @@ class CardApprovalFeatures(pydantic.BaseModel):
         Returns:
             pandas.DataFrame object, containing standardized data
         """
-        df = pandas.DataFrame({'credit_window': [self.credit_window], 'age': [self.age]})
+        df = self.get_dataframe()
+        numeric_features = df[df.select_dtypes(include="numeric").columns]
         scaler = StandardScaler() 
 
-        scaled_data = pandas.DataFrame(scaler.fit_transform(df), columns=['credit_window', 'age'])
+        scaled_data = pandas.DataFrame(
+            scaler.fit_transform(numeric_features), 
+            columns=numeric_features.columns
+        )
         return scaled_data 
 
-    
-    def __encode_job(self) -> pandas.DataFrame:
+    def __encode_categorical_features(self) -> pandas.DataFrame:
         """
-        Functions implements K-Fold Target Encoding for Feature called 'Job'
-        Returns:    
-            pandas.DataFrame object, containing encoded job value
         """
-        encoder = LabelEncoder()
-        enc_data = pandas.DataFrame(encoder.fit_transform([self.job]), columns=['job'])
-        return enc_data
