@@ -1,0 +1,2 @@
+DECISION_THRESHOLD = 0.926900812721681
+MODEL_CLASSIFIER_URL="../offline_training/classifier.pkl"
