@@ -30,4 +30,8 @@ networks:
   project_network:
     type: bridge
     external: True 
+<<<<<<< Updated upstream
     name: "ml-project-network"
+=======
+    name: "ml-network"
+>>>>>>> Stashed changes
