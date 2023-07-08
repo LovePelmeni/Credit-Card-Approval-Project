@@ -1,22 +1,57 @@
 import pydantic
 import pandas 
-from sklearn.preprocessing import StandardScaler 
+from sklearn.preprocessing import StandardScaler
+import typing, numpy
 
 class CardApprovalFeatures(pydantic.BaseModel):
 
     """
     Class Form represents set of features for predicting card approval status
     """
+
+    annual_income: float
+    credit_window: int
+
+    Male: bool = False # one of these fields 'Male' or 'Female' should be filled
+    Female: bool = False
+
+    total_children: int = 0
+
+    has_realty: bool = False
+    has_car: bool = False
+    married: bool = False
+
+    def set_datatypes(self, dataframe: pandas.DataFrame) -> None:
+        
+        """
+        Function sets datatypes for dataset features, according to it's possible range 
+
+        Args:
+            dataframe: target pandas.DataFrame object
+        """
+
+        dataframe['annual_income'] = dataframe['annual_income'].astype(numpy.float32)
+        dataframe['credit_window'] = dataframe['credit_window'].astype(numpy.float64)
+
+        dataframe['Male'] = dataframe['Male'].astype(numpy.bool_)
+        dataframe['Female'] = dataframe['Female'].astype(numpy.bool_)
+
+        dataframe["total_children"] = dataframe["total_children"].astype(numpy.int8)
+
+        dataframe["has_realty"] = dataframe["has_realty"].astype(numpy.bool_)
+        dataframe["has_car"] = dataframe["has_car"].astype(numpy.bool_)
+        dataframe["married"] = dataframe["married"].astype(numpy.bool_)
     
     def get_dataframe(self) -> pandas.DataFrame:
         """
         Function converts model to pandas.DataFrame object
         """
-        return pandas.DataFrame(
-            {
-                feature: [value] for feature, value in self.__dict__().items()
-            }
-        )
+        df = pandas.DataFrame() 
+        for feature, value in self.__dict__.items():
+            df[feature] = [value]
+
+        self.set_datatypes(df)
+        return df
     
     def encoded_data(self) -> pandas.DataFrame:
         """
@@ -30,10 +65,17 @@ class CardApprovalFeatures(pydantic.BaseModel):
         Returns:
             pandas.DataFrame object, containing encoded data
         """
-        enc_numeric = self.__standardize_numeric_features()
-        enc_categories = self.__encode_categorical_features()
+        if all([self.Male, self.Female]): 
+            raise ValueError("You need to choose one of the genders, Male or Female")
 
-        enc_data = pandas.concat([enc_categories, enc_numeric], axis=1)
+        if not self.Male and not self.Female:
+            raise ValueError("Field Male and Female are required, please, fill one of them")
+
+        df = self.get_dataframe()
+        enc_numeric = self.__standardize_numeric_features()
+        
+        boolean_features = df[df.select_dtypes(include="boolean").columns]
+        enc_data = pandas.concat([enc_numeric, boolean_features], axis=1)
         return enc_data
         
     def __standardize_numeric_features(self) -> pandas.DataFrame:
@@ -46,15 +88,25 @@ class CardApprovalFeatures(pydantic.BaseModel):
             pandas.DataFrame object, containing standardized data
         """
         df = self.get_dataframe()
-        numeric_features = df[df.select_dtypes(include="numeric").columns]
-        scaler = StandardScaler() 
+        numeric_features = df[df.select_dtypes(include="number").columns]
+        
+        values = numeric_features.values.reshape(-1, 1)
+        scaler = StandardScaler()
 
-        scaled_data = pandas.DataFrame(
-            scaler.fit_transform(numeric_features), 
-            columns=numeric_features.columns
-        )
-        return scaled_data 
+        data = scaler.fit_transform(values)
+        scaled_data = pandas.DataFrame(data.reshape(1, -1), columns=numeric_features.columns)
+        return scaled_data
 
-    def __encode_categorical_features(self) -> pandas.DataFrame:
-        """
-        """
+
+form = CardApprovalFeatures(
+    annual_income=400.000,
+    credit_window=30,
+    total_children=2,
+    Male=True,
+    has_car=True,
+    has_realty=True,
+    married=True
+)
+
+print(form.encoded_data())
+

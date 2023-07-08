@@ -7,3 +7,4 @@ K_FOLD_SPLITS = 10 # number of splitted folds in the dataset
 RANDOM_FOREST_FEATURE_SELECTION_EST = 100 # number of trees for Random Forest Classifier
 NUMBER_OF_RANDOMIZED_ITERATIONS=10 # number of iterations for RandomSearchCV 
 DEFAULT_DECISION_TH = 0.7 # decision threshold for binary classification
+NUMBER_OF_IMPORTANT_FEATURES=3
