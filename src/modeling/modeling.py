@@ -35,7 +35,4 @@ class CreditCardApprover(object):
 classifier_file = open(constants.MODEL_CLASSIFIER_URL, mode='rb')
 classifier = pickle.load(classifier_file)
 
-prediction_model = CreditCardApprover(
-    model=classifier,
-    decision_threshold=constants.DECISION_THRESHOLD
-)
+prediction_model = CreditCardApprover(model=classifier)

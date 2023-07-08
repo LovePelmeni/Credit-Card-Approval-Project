@@ -1,18 +1,34 @@
 import pytest
 import pandas
-from ...src.modeling import modeling
+from ...src.modeling import feature_form, modeling
 import numpy
+from ...src.modeling import exceptions
 
 def main_dataset() -> pandas.DataFrame:
     dataset = {
-        'age': [23, 45, 23, 21, 56, 64],
-        'job': ["Staff Engineer", "Senior Engineer", "Chief Executive", "Product Manager", "ML Engineer"],
-        'credit_window': [14, 32, 12, 18, 75, 56]
+        'credit_window': numpy.random.choice(a=numpy.arange(start=1, stop=1000)),
+        'annual_income': numpy.random.choice(a=numpy.arange(40000, 1000000)),
+        'Male': numpy.random.choice(a=[True, False]),
+        'Female': numpy.random.choice(a=[True, False]),
+        'has_car': numpy.random.choice(a=[True, False]),
+        'has_realty': numpy.random.choice(a=[True, False]),
     }
 
     return pandas.DataFrame(dataset, columns=dataset.keys())
 
+def invalid_dataset() -> pandas.DataFrame:
+    dataset = {
+        'credit_window': numpy.random.choice(a=numpy.arange(start=1, stop=1000)),
+        'annual_income': numpy.random.choice(a=numpy.arange(40000, 1000000)),
+        'Male': numpy.random.choice(a=[True, False, pandas.NA]),
+        'Female': numpy.random.choice(a=[True, False, pandas.NA]),
+        'has_car': numpy.random.choice(a=[True, False, pandas.NA]),
+        'has_realty': numpy.random.choice(a=[True, False, pandas.NA]),
+    }
+    return pandas.DataFrame(dataset, columns=dataset.keys())
+
 dataset = main_dataset() 
+inv_dataset = invalid_dataset()
 
 @pytest.mark.parametrize(
     [ 
@@ -24,20 +40,15 @@ dataset = main_dataset()
         dataset.iloc[:, 6],
     ]
 )
-def test_feature_encoders(test_dataset):
+def test_feature_numeric_encoders(test_dataset):
 
     allowed_range = numpy.arange(-1, 1)
 
-    features = modeling.CardApprovalFeatures(
-        age=test_dataset['age'],
-        job=test_dataset['job'],
-        credit_window=test_dataset['credit_window']
-    )
-    enc_data = features.encoded_data()
-    assert isinstance(enc_data['job'], numpy.int_)
-    assert isinstance(enc_data['age'][0], numpy.int_) and (enc_data['credit_window'][0], numpy.int_)
-    assert numpy.isin(enc_data['age'][0], allowed_range)
-    assert numpy.isin(enc_data['credit_window'][0], allowed_range)
+    features = modeling.CardApprovalFeatures(**test_dataset.to_dict())
+    encoded_data = features.encoded_data()
+    num_columns = encoded_data.select_dtypes(include='number').columns 
+    for column in num_columns:
+        assert encoded_data[column][0] in allowed_range 
 
 
 @pytest.mark.parametrize(
@@ -53,12 +64,20 @@ def test_feature_encoders(test_dataset):
 def test_prediction_model(test_dataset):
 
     model = modeling.prediction_model
-    features = modeling.CardApprovalFeatures(
-        age=test_dataset['age'],
-        job=test_dataset['job'],
-        credit_window=test_dataset['credit_window']
-    )
-    enc_data = features.encoded_data()
-    predicted_status = model.predict_card_approval(features=enc_data)
-    assert isinstance(predicted_status)
-    assert predicted_status is not None 
+    features = modeling.CardApprovalFeatures(**test_dataset.to_dict())
+    predicted_status = model.predict_card_approval(features=features)
+    assert isinstance(predicted_status, int)
+    assert predicted_status is not None
+    assert predicted_status in (0, 1)
+
+@pytest.mark.parametrize([
+    inv_dataset.iloc[:, 1],
+    inv_dataset.iloc[:, 2],
+    inv_dataset.iloc[:, 3],
+    inv_dataset.iloc[:, 4],
+    inv_dataset.iloc[:, 5],
+    inv_dataset.iloc[:, 6]
+])
+def test_fail_prediction_model(invalid_dataset):
+    with pytest.raises(expected_exception=exceptions.PredictionFailed):
+        feature_form = feature_form.CardApprovalFeatures(**invalid_dataset.to_dict())

@@ -3,10 +3,20 @@ import pandas
 from sklearn.preprocessing import StandardScaler
 import typing, numpy
 
+FEATURE_ORDER  =  ['Male', 'has_car', 'Married', 'Female', 'has_realty',
+       'credit_window', 'annual_income', 'total_children']
 class CardApprovalFeatures(pydantic.BaseModel):
 
     """
     Class Form represents set of features for predicting card approval status
+
+    NOTE:
+        does not change the format of the features (uppercase to lowercase and vice-versa)
+        example: 
+            Male -> male 
+
+        features has their own strict form, which in case 
+        of violation, can lead to potential issues at model fitting process
     """
 
     annual_income: float
@@ -19,7 +29,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
 
     has_realty: bool = False
     has_car: bool = False
-    married: bool = False
+    Married: bool = False
 
     def set_datatypes(self, dataframe: pandas.DataFrame) -> None:
         
@@ -40,7 +50,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
 
         dataframe["has_realty"] = dataframe["has_realty"].astype(numpy.bool_)
         dataframe["has_car"] = dataframe["has_car"].astype(numpy.bool_)
-        dataframe["married"] = dataframe["married"].astype(numpy.bool_)
+        dataframe["Married"] = dataframe["Married"].astype(numpy.bool_)
     
     def get_dataframe(self) -> pandas.DataFrame:
         """
@@ -76,7 +86,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
         
         boolean_features = df[df.select_dtypes(include="boolean").columns]
         enc_data = pandas.concat([enc_numeric, boolean_features], axis=1)
-        return enc_data
+        return enc_data[FEATURE_ORDER]
         
     def __standardize_numeric_features(self) -> pandas.DataFrame:
         """
@@ -96,17 +106,3 @@ class CardApprovalFeatures(pydantic.BaseModel):
         data = scaler.fit_transform(values)
         scaled_data = pandas.DataFrame(data.reshape(1, -1), columns=numeric_features.columns)
         return scaled_data
-
-
-form = CardApprovalFeatures(
-    annual_income=400.000,
-    credit_window=30,
-    total_children=2,
-    Male=True,
-    has_car=True,
-    has_realty=True,
-    married=True
-)
-
-print(form.encoded_data())
-
