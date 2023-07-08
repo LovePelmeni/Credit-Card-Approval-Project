@@ -1,9 +1,12 @@
 import logging
 import constants
 import pickle
-import feature_form, numpy
+import feature_form
+import numpy
+import exceptions
+import sklearn.exceptions 
 
-logger = logging.getLogger(__name__)
+ModelLogger = logging.getLogger(__name__)
 class CreditCardApprover(object):
     
     """
@@ -27,10 +30,15 @@ class CreditCardApprover(object):
             0 - if the client more likely would be rejected 
             1 - if the client has a high chance of being accepted
         """
-        enc_data = features.encoded_data()
-        pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0][1] # predicted prob of positive class
-        predicted_status = (pos_prob >= self.__decision_threshold).astype(int)
-        return predicted_status
+        try:
+            enc_data = features.encoded_data()
+            pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0][1] # predicted prob of positive class
+            predicted_status = (pos_prob >= self.__decision_threshold).astype(int)
+            return predicted_status
+            
+        except(ValueError, AttributeError, TypeError, sklearn.exceptions.NotFittedError) as err:
+            ModelLogger.error(err)
+            raise exceptions.PredictionFailed(msg=err.args)
 
 classifier_file = open(constants.MODEL_CLASSIFIER_URL, mode='rb')
 classifier = pickle.load(classifier_file)
