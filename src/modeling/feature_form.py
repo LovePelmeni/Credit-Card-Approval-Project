@@ -1,7 +1,7 @@
 import pydantic
 import pandas 
 from sklearn.preprocessing import StandardScaler
-import typing, numpy
+import numpy
 
 FEATURE_ORDER  =  ['Male', 'has_car', 'Married', 'Female', 'has_realty',
        'credit_window', 'annual_income', 'total_children']
@@ -106,3 +106,4 @@ class CardApprovalFeatures(pydantic.BaseModel):
         data = scaler.fit_transform(values)
         scaled_data = pandas.DataFrame(data.reshape(1, -1), columns=numeric_features.columns)
         return scaled_data
+
