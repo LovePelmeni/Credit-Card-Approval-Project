@@ -1,37 +1,16 @@
 version: "3.9"
 services:
-
-  nginx_server:
-    container_name: nginx_web_server 
-    image: nginx:latest
-    volumes:
-      nginx/nginx.conf:/etc/nginx/nginx.conf  
-    networks:
-      - project_network 
   
   application:
     container_name: ml_application 
-    image: crazycoderr/credit_card_ml_app:latest 
-    env_file: ./environment.env 
+    build: ./
+    env_file: ./environment.env
     ports:
       - "8080:8080"
     networks:
       - project_network
 
-  postgresql:
-    container_name: ml_database
-    image: postgres:latest 
-    ports:
-      - "5432:5432"
-    networks:
-      - project_network 
-
 networks:
   project_network:
-    type: bridge
     external: True 
-<<<<<<< Updated upstream
-    name: "ml-project-network"
-=======
     name: "ml-network"
->>>>>>> Stashed changes

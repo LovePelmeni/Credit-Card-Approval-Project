@@ -28,4 +28,3 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures):
         allowance for credit card approval. [%s]""" % prediction_err)
         return fastapi.responses.Response(status_code=500, 
         content={'error': 'server failed to predict status, internal error :('})
-
