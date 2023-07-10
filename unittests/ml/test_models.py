@@ -1,6 +1,7 @@
 import pandas
 from ...src.modeling import feature_form, modeling
-import numpy, pytest
+import numpy, unittest
+import pydantic
 
 def main_dataset() -> pandas.DataFrame:
     dataset = {
@@ -28,34 +29,39 @@ dataset = main_dataset()
 inv_dataset = invalid_dataset()
 
 
-@pytest.mark.parametrize(
-    "test_dataset,status",
-    [ 
-        (dataset.iloc[0], True),
-        (dataset.iloc[1], True),
-        (dataset.iloc[2], True),
-        (dataset.iloc[3], True),
-        (dataset.iloc[4], True),
-        (dataset.iloc[5], True),
-    ]
-)
-def test_feature_numeric_encoders(test_dataset, status):
 
-    allowed_range = numpy.arange(-2, 2).tolist()
+class DatasetValidatorTestCase(unittest.TestCase):
 
-    features = feature_form.CardApprovalFeatures(**test_dataset.to_dict())
-    encoded_data = features.encoded_data()
+    def test_feature_numeric_encoders(self):
 
-    num_columns = encoded_data.select_dtypes(include='number').columns 
-    print(num_columns)
-    assert all(encoded_data[column][0] in allowed_range for column in num_columns) == status
+        for record in range(len(dataset)):
+            test_dataset = dataset.iloc[record]
 
+            features = feature_form.CardApprovalFeatures(**test_dataset.to_dict())
+            encoded_data = features.encoded_data()
 
-def test_prediction_model(test_dataset):
+            num_columns = encoded_data.select_dtypes(include='number').columns 
+            for column in num_columns:
+                assert -2 <= encoded_data[column][0] <= 2
+
+    def test_prediction_form_invalidate(self):
+        
+        for record in range(len(dataset)):
+            test_dataset = inv_dataset.iloc[record]
+            with self.assertRaises(
+                expected_exception=pydantic.ValidationError,
+                msg="Form should be invalidated",
+            ):
+                feature_form.CardApprovalFeatures(**test_dataset.to_dict())
+
+def test_prediction_model():
 
     model = modeling.prediction_model
-    features = feature_form.CardApprovalFeatures(**test_dataset.to_dict())
-    predicted_status = model.predict_card_approval(features=features)
-    assert isinstance(predicted_status, int)
-    assert predicted_status is not None
-    assert predicted_status in (0, 1)
+    for record in range(len(dataset)):
+
+        test_dataset = dataset.iloc[record]
+        features = feature_form.CardApprovalFeatures(**test_dataset.to_dict())
+        predicted_status = model.predict_card_approval(features=features)
+
+        assert predicted_status is not None
+        assert predicted_status in (0, 1)
