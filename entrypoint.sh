@@ -6,9 +6,11 @@ echo "Activating Virtual Environment"
 
 pip list
 
+ls
+
 echo "Running Unittests..."
 
-pytest unittests
+pytest ./unittests
 
 if [ $? -ne 0 ]; then
     echo "Unittests Failed"
@@ -19,7 +21,7 @@ fi
 
 echo "Starting ASGI Server..."
 
-python settings.py
+python ./settings.py
 
 if [ $? -ne 0 ]; then
     echo "ASGI Server Startup Failure"

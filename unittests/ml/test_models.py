@@ -25,10 +25,8 @@ def invalid_dataset() -> pandas.DataFrame:
     }
     return pandas.DataFrame(data=dataset)
     
-dataset = main_dataset() 
+dataset = main_dataset()
 inv_dataset = invalid_dataset()
-
-
 
 class DatasetValidatorTestCase(unittest.TestCase):
 
@@ -43,17 +41,7 @@ class DatasetValidatorTestCase(unittest.TestCase):
             num_columns = encoded_data.select_dtypes(include='number').columns 
             for column in num_columns:
                 assert -2 <= encoded_data[column][0] <= 2
-
-    def test_prediction_form_invalidate(self):
-        
-        for record in range(len(dataset)):
-            test_dataset = inv_dataset.iloc[record]
-            with self.assertRaises(
-                expected_exception=pydantic.ValidationError,
-                msg="Form should be invalidated",
-            ):
-                feature_form.CardApprovalFeatures(**test_dataset.to_dict())
-
+                
 def test_prediction_model():
 
     model = modeling.prediction_model

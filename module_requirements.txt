@@ -6,3 +6,4 @@ pytest==7.4.0
 scikit-learn==1.2.2
 seaborn==0.12.2
 fastapi==0.97.0
+uvicorn==0.22.0
