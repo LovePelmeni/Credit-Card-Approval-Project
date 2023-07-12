@@ -1,6 +1,6 @@
 # import pytest
 # from ...src.modeling import feature_form, exceptions
-# from ...src.web import settings
+# from ...src import settings
 
 # import pytest
 # from fastapi.testclient import TestClient
