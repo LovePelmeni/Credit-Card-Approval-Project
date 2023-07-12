@@ -1,4 +1,4 @@
-from modeling import modeling, feature_form, exceptions
+from .modeling import modeling, feature_form, exceptions
 import fastapi.responses
 import fastapi.exceptions
 import logging

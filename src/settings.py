@@ -1,5 +1,5 @@
 import fastapi, os, uvicorn
-import rest_controllers
+from . import rest_controllers
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
 APPLICATION_HOST = os.environ.get("APPLICATION_HOST", "localhost")
