@@ -13,7 +13,8 @@ def load_valid_dataset():
         Male=True,
         total_children=0,
         has_car=True,
-        has_realty=True
+        has_realty=True,
+        Married=False
     )
 
 @pytest.fixture(scope='module')

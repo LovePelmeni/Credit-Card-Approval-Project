@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 def predict_card_approval(application_data: feature_form.CardApprovalFeatures):
     """
     Function predicts whether client would be allowed to have a credit card or not 
+    
     Args:
         application_data: Feature Dataset with client's personal informaton
     """
