@@ -21,7 +21,7 @@ fi
 
 echo "Starting ASGI Server..."
 
-python ./settings.py
+uvicorn settings:application --host 0.0.0.0 --port 8080
 
 if [ $? -ne 0 ]; then
     echo "ASGI Server Startup Failure"

@@ -6,7 +6,7 @@ services:
     build: ./
     env_file: ./environment.env
     ports:
-      - "8081:8081"
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://0.0.0.0:8081/healthcheck/"]
       retries: 5
