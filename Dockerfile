@@ -7,7 +7,7 @@ WORKDIR /project/dir/
 
 COPY ./src ./src
 COPY ./__init__.py ./
-COPY ./unittests ./unittests
+COPY ./tests ./tests
 COPY ./module_requirements.txt ./
 COPY ./module_constraints.txt ./
 COPY ./entrypoint.sh ./

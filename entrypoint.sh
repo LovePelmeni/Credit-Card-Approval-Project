@@ -10,7 +10,7 @@ ls
 
 echo "Running Unittests..."
 
-pytest ./unittests
+pytest tests
 
 if [ $? -ne 0 ]; then
     echo "Unittests Failed"
