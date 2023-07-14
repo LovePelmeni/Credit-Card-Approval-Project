@@ -1,10 +1,36 @@
-## Summary of critical features.
+Feature name	Explanation	Remarks
+ID	Client number	
 
-After doing analysis of the dataset I've come to the conclusion, that final decision
-may depend on the following characteristics
+CODE_GENDER	Gender	
 
-### Bank-Related Features:
-1. Credit History (if presented)
-2. Income (your salary)
-3. Credit Card Utilization Rate (how much credit you use)
-4. 
+FLAG_OWN_CAR	Is there a car	
+
+FLAG_OWN_REALTY	Is there a property	
+
+CNT_CHILDREN	Number of children	
+
+AMT_INCOME_TOTAL	Annual income	
+
+NAME_INCOME_TYPE	Income category	
+
+NAME_EDUCATION_TYPE	Education level	
+
+NAME_FAMILY_STATUS	Marital status	
+
+NAME_HOUSING_TYPE	Way of living	
+
+DAYS_BIRTH	Birthday	Count backwards from current day (0), -1 means yesterday
+
+DAYS_EMPLOYED	Start date of employment	Count backwards from current day(0). If positive, it means the person currently unemployed.
+
+FLAG_MOBIL	Is there a mobile phone	
+
+FLAG_WORK_PHONE	Is there a work phone	
+
+FLAG_PHONE	Is there a phone	
+
+FLAG_EMAIL	Is there an email	
+
+OCCUPATION_TYPE	Occupation	
+
+CNT_FAM_MEMBERS	Family size
