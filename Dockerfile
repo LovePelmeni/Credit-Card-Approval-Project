@@ -6,33 +6,33 @@ WORKDIR /project/dir/
 
 # Defining Arguments
 ARG HOME_DIR=/project/dir/
-ARG UID=1000
-ARG GID=1000
+ARG UID=1001
+ARG GID=1001
 
 ARG user=python_user 
 ARG group=python_group
 
+# Copying main content files to the Docker Image
+
+COPY  ./src ./src
+COPY  ./__init__.py ./
+COPY  ./tests ./tests
+COPY  ./module_requirements.txt ./
+COPY  ./module_constraints.txt ./
+COPY  ./entrypoint.sh ./
+COPY  ./rest_controllers.py ./
+COPY  ./settings.py ./
+
 # creating custom group
-RUN groupadd -g "${GID}" python_group
+RUN groupadd -g "${GID}" "${group}"
 
 # creating custom user and adding it to the group
-RUN useradd --create-home -u "${UID}" -g "${GID}" python_user
+RUN useradd --create-home -u "${UID}" -g "${GID}" "${user}"
+
+USER "${user}"
 
 # assigning access to the main directory
 RUN chown python_user:python_group -R "${HOME_DIR}"
-
-USER python_user
-
-# Copying main content files to the Docker Image
-
-COPY --chown="${user}":"${group}" ./src ./src
-COPY --chown="${user}":"${group}" ./__init__.py ./
-COPY --chown="${user}":"${group}" ./tests ./tests
-COPY --chown="${user}":"${group}" ./module_requirements.txt ./
-COPY --chown="${user}":"${group}" ./module_constraints.txt ./
-COPY --chown="${user}":"${group}" ./entrypoint.sh ./
-COPY --chown="${user}":"${group}" ./rest_controllers.py ./
-COPY --chown="${user}":"${group}" ./settings.py ./
 
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc
