@@ -37,12 +37,6 @@ RUN chown python_user:python_group -R "${HOME_DIR}"
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc
 
-# Installing basic dependencies
-
-# RUN apt-get update \ 
-# && apt-get install -y --no-install-recommends build-essential curl libq-dev \
-# && apt-get clean
-
 # upgrading pip packet manager 
 RUN pip install --upgrade pip 
 RUN pip install --upgrade setuptools wheel

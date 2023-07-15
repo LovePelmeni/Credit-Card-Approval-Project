@@ -12,10 +12,3 @@ application.add_api_route(
     endpoint=rest_controllers.predict_card_approval,
     response_description="Predicted Card Approval Status"
 )
-
-# if __name__ == '__main__':
-#     uvicorn.run(
-#         app=application, 
-#         host=APPLICATION_HOST, 
-#         port=APPLICATION_PORT
-#     )
