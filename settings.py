@@ -12,3 +12,10 @@ application.add_api_route(
     endpoint=rest_controllers.predict_card_approval,
     response_description="Predicted Card Approval Status"
 )
+
+application.add_api_route(
+    methods=["GET"],
+    path="/heatlhcheck/",
+    endpoint=rest_controllers.healthcheck,
+    response_description="Healthcheck Endpoint for Application State Check"
+)

@@ -2,6 +2,7 @@ from src.modeling import modeling, feature_form, exceptions
 import fastapi.responses
 import fastapi.exceptions
 import logging
+import fastapi.requests
 
 logger = logging.getLogger(__name__)
 
@@ -29,3 +30,6 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures):
         return fastapi.responses.Response(status_code=500, 
         content={'error': 'server failed to predict status, internal error :('})
 
+
+def healthcheck(request: fastapi.requests.Request):
+    return fastapi.responses.Response(status_code=200)
