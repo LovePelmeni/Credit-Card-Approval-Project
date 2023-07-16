@@ -2,15 +2,16 @@ FROM python:3.9-slim-bullseye
 LABEL maintainer=kirklimushin@gmail.com 
 
 # root user's username
-ARG user=python_user
+ENV ROOT_USER=python_user
+ENV APPLICATION_PORT=8080
 
 # creating root user and assigning sudo privileges
 
-RUN useradd -ms /bin/bash ${user}
-RUN usermod -aG sudo ${user}
+RUN useradd -ms /bin/bash ${ROOT_USER}
+RUN usermod -aG sudo ${ROOT_USER}
 
 # Initializing Working Directory 
-WORKDIR /project/dir/${user}
+WORKDIR /project/dir/${ROOT_USER}
 
 # Copying main content files to the Docker Image
 
@@ -33,9 +34,11 @@ RUN pip install --upgrade setuptools wheel
 # installing dependencies inside virtual environment
 RUN pip install -r module_requirements.txt -c module_constraints.txt
 
-# defining healthchecks strategy
+# upgrading fastapi web framework packages  
+RUN pip install 'fastapi[all]' --upgrade
+
 HEALTHCHECK --interval=30s --timeout=5s \
-cmd curl -f "http://localhost:${APPLICATION_PORT}/healthcheck/" || echo "server did not respond!" && exit 1
+CMD curl -f "http://localhost:${APPLICATION_HOST}/healthcheck/" || (echo "Server did not respond!" && exit 1); 
 
 # Giving acccess to the shell script
 RUN chmod +x ./entrypoint.sh
