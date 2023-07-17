@@ -10,7 +10,7 @@ ls
 
 echo "Running Unittests..."
 
-pytest
+python -m pytest
 
 if [ $? -ne 0 ]; then
     echo "Unittests Failed"
