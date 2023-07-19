@@ -1,5 +1,9 @@
-import fastapi, os, uvicorn
+import fastapi, os
 import rest_controllers
+import logging 
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename="startup.log")
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
 APPLICATION_HOST = os.environ.get("APPLICATION_HOST", "localhost")
