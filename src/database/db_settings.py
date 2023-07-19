@@ -41,9 +41,9 @@ def update_configuration_file():
     config = configparser.ConfigParser()
     alem_file = Path('alembic.ini')  #Path of your .ini file
     config.read(alem_file)
-    config.set('sqlalchemy.url', DATABASE_URL) #Updating existing entry 
-    config.write(alem_file.open("w"))
 
+    config.set('alembic', 'sqlalchemy.url', DATABASE_URL) #Updating existing entry 
+    config.write(alem_file.open("w"))
 
 update_configuration_file()
 
