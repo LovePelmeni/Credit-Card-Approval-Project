@@ -8,19 +8,18 @@ stratify_records = (
     lambda number_of_samples: """
     with categories as (
         select distinct bad as status_category
-        from ApplicationRecords 
+        from CreditTransactions
     ),
     records as (
         select 
             row_number() over(partition by status_category order by rand() ) as rnk,
             *
-        from ApplicationRecords as app_recs 
-        join CreditRecords as credit_recs using(client_id)
+        from CustomerApplications as app_recs 
+        join CreditTransactions as credit_recs using(client_id)
     )
-    select %s from records where rnk <= %s
+    select * from records where rnk <= %s
 
 """ % (
-    important_features, 
     number_of_samples
     )
 )

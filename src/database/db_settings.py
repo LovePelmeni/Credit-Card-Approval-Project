@@ -1,27 +1,55 @@
-import sqlalchemy
-from sqlalchemy.engine import Engine 
+from sqlalchemy.engine import create_engine as create_sql_engine, Engine
 from sqlalchemy.orm import sessionmaker
 import os
 import psycopg2.errors
-import logging, typing
+import logging
+
+from pathlib import Path
+import configparser
 
 Logger = logging.getLogger(__name__)
 
-DATABASE_NAME = os.environ.get("DATABASE_NAME", None)
-DATABASE_USER = os.environ.get("DATABASE_USER", None)
-DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", None)
-DATABASE_HOST = os.environ.get("DATABASE_HOST", None)
-DATABASE_PORT = os.environ.get("DATABASE_PORT", None)
+DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
+DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
+DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "postgres")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
+DATABASE_PORT = os.environ.get("DATABASE_PORT", "5434")
 
-DATABASE_URL = "psql://%s:%s@%s:%s/%s" % (
-    DATABASE_HOST,
-    DATABASE_PORT,
+if not all(
+    [
+        DATABASE_NAME, DATABASE_USER, 
+        DATABASE_PASSWORD, 
+        DATABASE_HOST, DATABASE_PORT
+    ]):
+    raise SystemExit(
+        "Some of Database Required Parameters are missing, make sure you have set up env variables"
+    )
+
+DATABASE_URL = "postgresql://%s:%s@%s:%s/%s" % (
     DATABASE_USER,
     DATABASE_PASSWORD,
+    DATABASE_HOST,
+    DATABASE_PORT,
     DATABASE_NAME
 )
 
-def create_engine(database_url: str) -> typing.Generator[Engine]:
+def update_configuration_file():
+    """
+    Function updates internal alembic configuration file to dynamically set
+    current database url, that sqlalchemy use
+    """
+    config = configparser.ConfigParser()
+    alem_file = Path('alembic.ini')  #Path of your .ini file
+    config.read(alem_file)
+    config.set('sqlalchemy.url', DATABASE_URL) #Updating existing entry 
+    config.write(alem_file.open("w"))
+
+
+update_configuration_file()
+
+
+
+def create_engine(database_url: str) -> Engine:
     """
     Function creates new database engine, based on provided
     `database_url`
@@ -34,18 +62,17 @@ def create_engine(database_url: str) -> typing.Generator[Engine]:
         Database Engine Object
     """
     try:
-        new_engine = Engine(
-            url=database_url, 
-            pool=True
+        new_engine = create_sql_engine(
+            url=database_url
         )
-        yield new_engine
+        return new_engine
     except(psycopg2.errors.ConnectionException) as err:
         Logger.critical(err)
         raise RuntimeError("Database Connection Failure")
 
 new_engine = create_engine(DATABASE_URL) 
 
-def get_user_session() -> typing.Generator[sessionmaker]:
+def get_user_session() -> sessionmaker:
     """
     Function creates user default session 
     """
@@ -54,7 +81,7 @@ def get_user_session() -> typing.Generator[sessionmaker]:
             bind=new_engine,
             autoflush=False
         )
-        yield user_session()
+        return user_session()
     except(psycopg2.errors.ProgrammingError, 
     psycopg2.errors.CannotConnectNow) as conn_err:
         Logger.critical(conn_err)
