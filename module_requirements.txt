@@ -8,3 +8,4 @@ scikit-optimize==0.9.0
 scipy==1.11.0
 seaborn==0.12.2
 fastapi==0.97.0
+alembic==1.11.1

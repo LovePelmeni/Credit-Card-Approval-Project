@@ -50,9 +50,31 @@ def get_user_session() -> typing.Generator[sessionmaker]:
     Function creates user default session 
     """
     try:
-        user_session = sessionmaker(bind=new_engine)()
-        yield user_session 
+        user_session = sessionmaker(
+            bind=new_engine,
+            autoflush=False
+        )
+        yield user_session()
     except(psycopg2.errors.ProgrammingError, 
     psycopg2.errors.CannotConnectNow) as conn_err:
         Logger.critical(conn_err)
         raise RuntimeError("Failed to get user session")
+
+class DatabaseSession(object):
+    """
+    Standard Interface for database session
+    """
+    def __init__(self, session):
+        self.session = session 
+
+    def __enter__(self):
+        return self.session
+
+    def __exit__(self):
+        self.session.close()
+
+# Initializing basics ORM Table Abstraction 
+
+from sqlalchemy.orm import declarative_base
+
+Model = declarative_base()
