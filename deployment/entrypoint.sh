@@ -6,7 +6,23 @@ echo "Activating Virtual Environment"
 
 pip list
 
-ls
+echo "Available PIP modules"
+ls 
+
+echo "Updating code style using autopep8"
+
+autopep8 . --recursive --in-place 
+
+echo "Checking Code Style using flake8..."
+
+flake8 .
+
+if [ $? -ne 0 ]; then 
+    echo "Codestyle Failed tests..."
+    exit 1
+else
+    echo "Codestyle is fine..."
+fi
 
 echo "Running Unittests..."
 

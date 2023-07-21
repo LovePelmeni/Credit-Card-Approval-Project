@@ -1,16 +1,18 @@
-import typing, numpy
+import typing
+import numpy
 from sklearn.model_selection import cross_validate, StratifiedKFold
-import pandas 
+import pandas
+
 
 def cross_validate_new_model(
 
-    model, 
-    metrics: typing.List[typing.Callable], 
+    model,
+    metrics: typing.List[typing.Callable],
     error_scorer: typing.Callable,
     X_data: pandas.DataFrame,
     Y_data: typing.Union[pandas.DataFrame, pandas.Series]
 
-    ) -> typing.Dict[str, float]:
+) -> typing.Dict[str, float]:
 
     """
     Functions, used for Cross-Validating new model with updated 
@@ -20,11 +22,11 @@ def cross_validate_new_model(
         model - Machine Learning Classifier with new hyperparameters 
         metrics: list of scorers (aka. metrics - precision, recall or custom metric) 
         for evaluating model's performance 
-        
+
         error_scorer: loss function for classifier
         X_data: pandas.DataFrame object, containing Training Set for the model 
         Y_data: pandas.Series object, containing target feature for training the model
-    
+
     Returns:
         hashmap, containing metric scores, specified at `metrics` argument 
         example:
@@ -39,7 +41,7 @@ def cross_validate_new_model(
                 }
     """
 
-    cv = StratifiedKFold(n_splits=5) 
+    cv = StratifiedKFold(n_splits=5)
     cv_scores = cross_validate(
         X=X_data,
         y=Y_data,
@@ -49,8 +51,8 @@ def cross_validate_new_model(
         error_score=error_scorer,
         n_jobs=-1
     )
-        
-    metric_hashmap = {} 
+
+    metric_hashmap = {}
 
     for metric in metrics:
         if "train_%s" % metric in cv_scores:

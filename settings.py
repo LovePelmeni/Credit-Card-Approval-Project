@@ -1,6 +1,7 @@
-import fastapi, os
+import fastapi
+import os
 import rest_controllers
-import logging 
+import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="startup.log")
