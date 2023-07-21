@@ -34,3 +34,10 @@ FLAG_EMAIL	Is there an email
 OCCUPATION_TYPE	Occupation	
 
 CNT_FAM_MEMBERS	Family size
+
+
+
+# Additional Features 
+Financial Stability Index 
+
+Responsibility Score
