@@ -1,6 +1,6 @@
 import pytest
 from ...src.modeling import feature_form, exceptions
-from ...src import settings
+from ...settings import application
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,12 +8,11 @@ import unittest.mock
 import pydantic
 
 def load_valid_dataset() -> pydantic.BaseModel:
-
     return feature_form.CardApprovalFeatures()
 
 @pytest.fixture(scope='module')
 def test_client():
-    return TestClient(settings.application)
+    return TestClient(application)
 
 def test_prediction_controller(test_client):
     dataset = load_valid_dataset()
