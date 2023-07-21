@@ -13,6 +13,7 @@ def cross_validate_new_model(
     Y_data: typing.Union[pandas.DataFrame, pandas.Series]
 
 ) -> typing.Dict[str, float]:
+
     """
     Functions, used for Cross-Validating new model with updated 
     hyperparameters to ensure it's prediction accuracy

@@ -2,8 +2,7 @@ FROM python:3.9-slim-bullseye
 LABEL maintainer=kirklimushin@gmail.com 
 
 # root user's username
-ENV ROOT_USER=python_user
-ENV APPLICATION_PORT=8080
+ARG ROOT_USER=python_user
 
 # creating root user and assigning sudo privileges
 
@@ -18,11 +17,11 @@ WORKDIR /project/dir/${ROOT_USER}
 COPY  ./src ./src
 COPY  ./__init__.py ./
 COPY  ./tests ./tests
-COPY  ./module_requirements.txt ./
-COPY  ./module_constraints.txt ./
-COPY  ./entrypoint.sh ./
+COPY  ./proj_requirements ./proj_requirements
+COPY  ./deployment/entrypoint.sh ./
 COPY  ./rest_controllers.py ./
 COPY  ./settings.py ./
+COPY ./tox.ini ./
 
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc
@@ -32,13 +31,11 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools wheel
 
 # installing dependencies inside virtual environment
-RUN pip install -r module_requirements.txt -c module_constraints.txt
+RUN pip install -r ./proj_requirements/module_requirements.txt \ 
+-c ./proj_requirements/module_constraints.txt
 
 # upgrading fastapi web framework packages  
 RUN pip install 'fastapi[all]' --upgrade
-
-HEALTHCHECK --interval=30s --timeout=5s \
-CMD curl -f "http://localhost:${APPLICATION_HOST}/healthcheck/" || (echo "Server did not respond!" && exit 1); 
 
 # Giving acccess to the shell script
 RUN chmod +x ./entrypoint.sh

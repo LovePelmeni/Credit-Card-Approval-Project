@@ -2,7 +2,6 @@
   <h2> Credit Card Approval Project</h2>
 </div>
 
-
 [comment]: <> ("Docs Badges goes there")
 
 <div class="container badges" 

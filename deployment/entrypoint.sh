@@ -19,6 +19,7 @@ flake8 .
 
 if [ $? -ne 0 ]; then 
     echo "Codestyle Failed tests..."
+    exit 1
 else
     echo "Codestyle is fine..."
 fi
