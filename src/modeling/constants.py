@@ -1,2 +1,2 @@
 DECISION_THRESHOLD = 0.9783825085241585
-MODEL_CLASSIFIER_URL = "src/offline_training/classifier.pkl"
+MODEL_CLASSIFIER_URL = "src/models/classifier.pkl"

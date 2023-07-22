@@ -14,7 +14,7 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures):
         application_data: Feature Dataset with client's personal informaton
     """
     try:
-        predicted_status = modeling.prediction_model.predict_approval(
+        predicted_status = modeling.prediction_model.predict_card_approval(
             application_data)
         return fastapi.responses.JSONResponse(
             status_code=201,
