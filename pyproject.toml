@@ -1,4 +1,20 @@
-[flake8]
+[tool.poetry]
+name = "credit-card-approval"
+version = "0.1.0"
+description = "Credit Card Approval ML Project"
+authors = ["Kirill Klimushin Alexandrovich"]
+readme = "README.md"
+packages = [{include = "credit_card_approval"}]
 
-exclude = .git,__pycache__,.pytest_cache,__init__.py,.ipynb_checkpoints
-ignore = E501,E203,W291
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+flake8 = "^6.0.0"
+autopep8 = "^2.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
