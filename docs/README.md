@@ -88,11 +88,16 @@ $ source ./fn_env/bin/activate
 $ pip install -r proj_requirements/module_requirements.txt -c proj_requirements/module_constraints.txt
 ```
 
-### Run shell script called `local_dev.sh`
+### Run Uvicorn ASGI Server via console
 ```
-$ chmod +x ./local_dev.sh
-$ sh ./local_dev.sh
+$ cd credit_card_approval
+
+$ uvicorn settings:application --host 0.0.0.0 --port 8080 --log-level=debug --workers 8
 ```
+
+NOTE: 
+  you can adjust number of asgi workers based on your configuration
+  recommended number is 2 * (number of cores) + 1
 
 ## Deployment
 
