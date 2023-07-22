@@ -9,3 +9,4 @@ fastapi==0.97.0
 uvicorn==0.22.0
 xgboost==1.7.6
 autopep8==2.0.2
+flake8==6.0.0

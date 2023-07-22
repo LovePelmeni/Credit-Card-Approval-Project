@@ -49,8 +49,23 @@ for predicting credit card approval, based on your personal information, includi
 3. Docker-Compose >= `1.29.2`
 3. GNU bash >= `3.2.57`
 
-# Usage
 
+## Directory overview 
+
+`src` - contains all source code for the project, including ML models and Datasets
+
+`env` - Environment Variables for the project 
+
+`deployment` - deployment files and bash scripts
+
+`docs` - contains documentation for the project 
+
+`tests` - contains tests 
+
+`proj_requirements` - contains project dependencies instructions 
+
+
+# Usage
 
 ### Clone project using following command
 
@@ -70,7 +85,7 @@ $ source ./fn_env/bin/activate
 ### Installing project dependencies
 
 ```
-$ pip install -r module_requirements.txt
+$ pip install -r proj_requirements/module_requirements.txt -c proj_requirements/module_constraints.txt
 ```
 
 ### Run shell script called `local_dev.sh`
@@ -84,13 +99,8 @@ $ sh ./local_dev.sh
 ### Running project using Docker-Compose
 
 ```
-$ docker-compose up -d 
+$ docker-compose up -d
 ```
+In case you don't want to keep cache of this image add `--no--cache` flag
 
-#### NOTE:
-
-If you don't want to keep cache of this image on your machine,
-add  `--no--cache` flag to runtime command
-    
-    
-    
+## Testing Application 
