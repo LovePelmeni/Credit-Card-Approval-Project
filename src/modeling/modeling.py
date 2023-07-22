@@ -33,7 +33,7 @@ class CreditCardApprover(object):
             1 - if the client has a high chance of being accepted
         """
         try:
-            enc_data = features.encoded_data()
+            enc_data = features.get_dataframe()
             pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0][1]
             predicted_status = (
                 pos_prob >= self.__decision_threshold).astype(int)

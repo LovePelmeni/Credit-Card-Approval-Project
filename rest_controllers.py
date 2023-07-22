@@ -1,3 +1,4 @@
+from this import d
 from src.modeling import modeling, feature_form, exceptions
 import fastapi.responses
 import fastapi.exceptions
@@ -14,8 +15,7 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures):
         application_data: Feature Dataset with client's personal informaton
     """
     try:
-        predicted_status = modeling.prediction_model.predict_card_approval(
-            application_data)
+        predicted_status = modeling.prediction_model.predict_card_approval(application_data)
         return fastapi.responses.JSONResponse(
             status_code=201,
             content={
