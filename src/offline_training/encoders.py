@@ -1,8 +1,7 @@
 from sklearn.preprocessing import OrdinalEncoder
 import pandas
 import numpy
-import feature_constants
-
+from . import feature_constants
 
 def encode_living_place_feature(dataset: pandas.DataFrame):
     """
