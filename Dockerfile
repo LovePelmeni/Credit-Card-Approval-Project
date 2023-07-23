@@ -22,6 +22,9 @@ COPY  ./deployment/entrypoint.sh ./
 COPY  ./rest_controllers.py ./
 COPY  ./settings.py ./
 COPY ./tox.ini ./
+COPY ./pyproject.toml ./
+COPY ./poetry.lock ./
+
 
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc
@@ -29,8 +32,14 @@ RUN apt-get update -y && apt-get install -y gcc
 # upgrading pip packet manager 
 RUN pip install --upgrade pip
 
+# Installing poetry manager for Python
+RUN pip install poetry --upgrade
+
+# Updating Production Requirements for the Project using Poetry
+RUN poetry export --format=requirements.txt --output proj_requirements/prod_requirements.txt
+
 # installing dependencies inside virtual environment
-RUN pip install -r ./proj_requirements/module_requirements.txt \ 
+RUN pip install -r ./proj_requirements/proj_requirements.txt \ 
 -c ./proj_requirements/module_constraints.txt
 
 # upgrading fastapi web framework packages  
