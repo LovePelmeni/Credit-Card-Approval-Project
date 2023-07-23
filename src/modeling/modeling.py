@@ -8,7 +8,6 @@ import sklearn.exceptions
 
 ModelLogger = logging.getLogger(__name__)
 
-
 class CreditCardApprover(object):
 
     """

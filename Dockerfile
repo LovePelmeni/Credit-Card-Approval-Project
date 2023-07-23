@@ -27,8 +27,7 @@ COPY ./tox.ini ./
 RUN apt-get update -y && apt-get install -y gcc
 
 # upgrading pip packet manager 
-RUN pip install --upgrade pip 
-RUN pip install --upgrade setuptools wheel
+RUN pip install --upgrade pip
 
 # installing dependencies inside virtual environment
 RUN pip install -r ./proj_requirements/module_requirements.txt \ 
