@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye
+FROM python:3.9-bullseye
 LABEL maintainer=kirklimushin@gmail.com 
 
 # root user's username
@@ -17,10 +17,14 @@ WORKDIR /project/dir/${ROOT_USER}
 COPY  ./src ./src
 COPY  ./__init__.py ./
 COPY  ./tests ./tests
+COPY  ./integration ./
 COPY  ./proj_requirements ./proj_requirements
+COPY  ./env ./
 COPY  ./deployment/entrypoint.sh ./
 COPY  ./rest_controllers.py ./
 COPY  ./settings.py ./
+
+# Copying additional configuration files
 COPY ./tox.ini ./
 COPY ./pyproject.toml ./
 COPY ./poetry.lock ./
@@ -36,11 +40,13 @@ RUN pip install --upgrade pip
 RUN pip install poetry --upgrade
 
 # Updating Production Requirements for the Project using Poetry
-RUN poetry export --format=requirements.txt --output proj_requirements/prod_requirements.txt
+
+RUN poetry export --format=requirements.txt \
+--output proj_requirements/prod_requirements.txt --without-hashes
 
 # installing dependencies inside virtual environment
-RUN pip install -r ./proj_requirements/proj_requirements.txt \ 
--c ./proj_requirements/module_constraints.txt
+RUN pip install -r proj_requirements/prod_requirements.txt \ 
+-c proj_requirements/prod_constraints.txt
 
 # upgrading fastapi web framework packages  
 RUN pip install 'fastapi[all]' --upgrade
