@@ -5,7 +5,6 @@ import numpy
 from src.offline_training import encoders 
 from src.offline_training import feature_constants
 from src.offline_training import features
-import typing
 
 class CardApprovalFeatures(pydantic.BaseModel):
 
@@ -36,16 +35,21 @@ class CardApprovalFeatures(pydantic.BaseModel):
 
     @pydantic.validator("income_category", check_fields=True)
     def validate_income_category(cls, income_category):
-        return income_category in feature_constants.INCOME_CATEGORIES
+        if income_category not in feature_constants.INCOME_CATEGORIES:
+            raise pydantic.ValidationError()
+        return income_category
 
     @pydantic.validator("education_category", check_fields=True)
     def validate_education_category(cls, education_category):
-        return education_category in feature_constants.EDUCATION_CATEGORIES
+        if education_category not in feature_constants.EDUCATION_CATEGORIES:
+            raise pydantic.ValidationError()
+        return education_category
 
     @pydantic.validator("living_place", check_fields=True)
     def validate_living_place(cls, living_place):
-        return living_place in feature_constants.LIVING_PLACES
-
+        if living_place not in feature_constants.LIVING_PLACES:
+            raise pydantic.ValidationError() 
+        return living_place
 
 
     def set_datatypes(self, dataframe: pandas.DataFrame) -> None:

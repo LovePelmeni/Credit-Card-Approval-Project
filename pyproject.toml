@@ -3,8 +3,6 @@ name = "credit-card-approval"
 version = "0.1.0"
 description = "Credit Card Approval ML Project"
 authors = ["Kirill Klimushin Alexandrovich"]
-readme = "README.md"
-packages = [{include = "credit_card_approval"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -12,7 +10,6 @@ alembic = "^1.11.1"
 psycopg = "^3.1.9"
 jupyter = "1.0.0"
 pydantic = "1.10.9"
-pytest = "7.4.0"
 scikit-learn = "1.2.2"
 fastapi = "0.97.0"
 uvicorn = "0.22.0"
@@ -20,11 +17,11 @@ xgboost = "1.7.6"
 autopep8 = "2.0.2"
 flake8 = "6.0.0"
 pandas = "^2.0.3"
+pytest = "^7.4.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "1.0.0"
 pydantic = "1.10.9"
-pytest = "7.4.0"
 scikit-learn = "1.2.2"
 fastapi = "0.97.0"
 uvicorn = "0.22.0"
@@ -35,6 +32,7 @@ alembic = "^1.11.1"
 sqlalchemy = "^2.0.19"
 psycopg = "^3.1.9"
 pandas = "^2.0.3"
+pytest = "^7.4.0"
 
 [tool.pytest.ini_options]
 minversion = "7.4.0"

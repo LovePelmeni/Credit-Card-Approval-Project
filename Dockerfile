@@ -1,8 +1,12 @@
-FROM python:3.9-bullseye
+FROM python:3.10-bullseye
 LABEL maintainer=kirklimushin@gmail.com 
 
 # root user's username
 ARG ROOT_USER=python_user
+
+# Environment Project Variables
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV PYTHONUNBUFFERED=0
 
 # creating root user and assigning sudo privileges
 
@@ -17,9 +21,9 @@ WORKDIR /project/dir/${ROOT_USER}
 COPY  ./src ./src
 COPY  ./__init__.py ./
 COPY  ./tests ./tests
-COPY  ./integration ./
+COPY  ./integration ./integration
 COPY  ./proj_requirements ./proj_requirements
-COPY  ./env ./
+COPY  ./env ./env
 COPY  ./deployment/entrypoint.sh ./
 COPY  ./rest_controllers.py ./
 COPY  ./settings.py ./
@@ -28,7 +32,6 @@ COPY  ./settings.py ./
 COPY ./tox.ini ./
 COPY ./pyproject.toml ./
 COPY ./poetry.lock ./
-
 
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc
@@ -41,12 +44,13 @@ RUN pip install poetry --upgrade
 
 # Updating Production Requirements for the Project using Poetry
 
-RUN poetry export --format=requirements.txt \
---output proj_requirements/prod_requirements.txt --without-hashes
+RUN poetry install --no-dev 
 
-# installing dependencies inside virtual environment
-RUN pip install -r proj_requirements/prod_requirements.txt \ 
--c proj_requirements/prod_constraints.txt
+# Export production requirements using Poetry
+RUN poetry export --format=requirements.txt --output proj_requirements/prod_requirements.txt --without-hashes
+
+# Install production dependencies with pip
+RUN pip install -r ./proj_requirements/prod_requirements.txt
 
 # upgrading fastapi web framework packages  
 RUN pip install 'fastapi[all]' --upgrade

@@ -1,7 +1,9 @@
 import pandas
 from ...src.modeling import feature_form, modeling
-import numpy, unittest
+import numpy
+import unittest
 import pydantic
+
 
 def main_dataset() -> pandas.DataFrame:
     dataset = {
@@ -14,6 +16,7 @@ def main_dataset() -> pandas.DataFrame:
     }
     return pandas.DataFrame(data=dataset)
 
+
 def invalid_dataset() -> pandas.DataFrame:
     dataset = {
         'credit_window': numpy.random.choice(a=numpy.arange(start=1, stop=1000), size=6),
@@ -24,9 +27,11 @@ def invalid_dataset() -> pandas.DataFrame:
         'has_realty': numpy.random.choice(a=[True, False, pandas.NA], size=6),
     }
     return pandas.DataFrame(data=dataset)
-    
+
+
 dataset = main_dataset()
 inv_dataset = invalid_dataset()
+
 
 class DatasetValidatorTestCase(unittest.TestCase):
 
@@ -41,7 +46,8 @@ class DatasetValidatorTestCase(unittest.TestCase):
             num_columns = encoded_data.select_dtypes(include='number').columns 
             for column in num_columns:
                 assert -2 <= encoded_data[column][0] <= 2
-                
+
+
 def test_prediction_model():
 
     model = modeling.prediction_model
