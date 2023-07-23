@@ -1,6 +1,5 @@
 # Local Development
 
-
 ## Developing
 
 1. Create directory with your functionality inside `src`
@@ -11,6 +10,7 @@ $ cd src
 $ mkdir new_module 
 
 $ cd new_module && touch new_functionality.py
+
 ```
 
 2. Depending on what you want to develop you can add 
@@ -28,6 +28,14 @@ $ mkdir my_tests
 
 $ cd my_tests && touch some_test.py
 
+```
+
+## Updating Production and Development dependencies using Poetry 
+
+```
+$ cd credit_card_approval
+$ poetry export --format=requirements.txt \
+--output ./proj_requirements/prod_requirements.txt --without-hashes
 ```
 
 ## Autoformatting Code Style 

@@ -26,7 +26,7 @@ fi
 
 echo "Running Unittests..."
 
-python -m pytest
+pytest -s
 
 if [ $? -ne 0 ]; then
     echo "Unittests Failed"
