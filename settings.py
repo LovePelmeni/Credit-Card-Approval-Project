@@ -1,4 +1,6 @@
-import fastapi, os, uvicorn
+import fastapi
+import os
+import uvicorn
 import rest_controllers
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
@@ -15,7 +17,7 @@ application.add_api_route(
 
 if __name__ == '__main__':
     uvicorn.run(
-        app=application, 
-        host=APPLICATION_HOST, 
+        app=application,
+        host=APPLICATION_HOST,
         port=APPLICATION_PORT
     )
