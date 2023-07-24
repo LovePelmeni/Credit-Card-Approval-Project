@@ -4,10 +4,10 @@ import fastapi.exceptions
 import logging
 import fastapi.requests
 from fastapi.responses import Response
-import json
 
 logger = logging.getLogger(__name__)
-
+handler = logging.FileHandler(filename="./logs/rest_controllers.log")
+logger.addHandler(handler)
 
 def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -> Response:
     """
@@ -29,6 +29,7 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -
             status_code=400, detail=val_err.args)
 
     except (exceptions.PredictionFailed) as prediction_err:
+        logger.error(prediction_err.msg)
         return fastapi.responses.JSONResponse(status_code=500,
         content={'error': 'server failed to predict status, internal error :('})
 

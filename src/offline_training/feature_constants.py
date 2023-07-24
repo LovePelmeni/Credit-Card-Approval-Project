@@ -24,5 +24,15 @@ LIVING_PLACES = (
 )
 
 FEATURE_ORDER = (
-
+        "annual_income", 
+        "education_category",
+        "living_place", 
+        "family_size",
+        "age",
+        "working_years",
+        "emp_stability",
+        "has_children",
+        "owns_realty_and_car",
+        "has_contact_information",
+        "credit_window",
 )

@@ -1,12 +1,14 @@
 import logging
 from . import constants
-import pickle
 from . import feature_form
 import numpy
 from . import exceptions
 import sklearn.exceptions
+import xgboost
 
 ModelLogger = logging.getLogger(__name__)
+file_handler = logging.FileHandler(filename="./logs/modeling.log")
+ModelLogger.addHandler(file_handler)
 
 class CreditCardApprover(object):
 
@@ -15,9 +17,13 @@ class CreditCardApprover(object):
     credit card approvals
     """
 
-    def __init__(self, model, decision_threshold: float = 0.5):
-        self.__model = model
-        self.__decision_threshold = decision_threshold
+    def __init__(self):
+        self.__model = xgboost.XGBClassifier()
+        self.__decision_threshold = constants.DECISION_THRESHOLD
+        self.__load_model()
+
+    def __load_model(self):
+        self.__model.load_model(fname=constants.MODEL_CLASSIFIER_URL)
 
     def predict_card_approval(self, features: feature_form.CardApprovalFeatures):
         """
@@ -43,8 +49,4 @@ class CreditCardApprover(object):
             ModelLogger.error(err)
             raise exceptions.PredictionFailed(msg=err.args)
 
-
-classifier_file = open(constants.MODEL_CLASSIFIER_URL, mode='rb')
-classifier = pickle.load(classifier_file)
-
-prediction_model = CreditCardApprover(model=classifier)
+prediction_model = CreditCardApprover()

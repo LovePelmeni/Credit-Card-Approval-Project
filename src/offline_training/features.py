@@ -1,11 +1,10 @@
-def create_emp_stability(number_of_years: int = None):
+def create_emp_stability(number_of_years: int):
     """
     Function creates feature of employee stability, based on the number of years
     
     Args:
         number_of_years: int
     """
-    if number_of_years is None: return False
     return True if number_of_years >= 5 else False 
 
 def create_owns_realty_and_car(has_car: bool, has_realty: bool):

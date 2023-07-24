@@ -1,10 +1,16 @@
 import pydantic
 import pandas
 import numpy
+import pandas.errors 
 
 from src.offline_training import encoders 
 from src.offline_training import feature_constants
 from src.offline_training import features
+import logging 
+
+logger = logging.getLogger(__name__)
+file_handler = logging.FileHandler("./logs/feature_form.log")
+logger.addHandler(file_handler)
 
 class CardApprovalFeatures(pydantic.BaseModel):
 
@@ -18,11 +24,12 @@ class CardApprovalFeatures(pydantic.BaseModel):
     credit_window: int
     family_size: int
     working_years: int
+    age: int
 
     income_category: str
     education_category: str
     living_place: str
-    
+
     # Optional Fields
 
     has_car: bool = False
@@ -36,22 +43,22 @@ class CardApprovalFeatures(pydantic.BaseModel):
     @pydantic.validator("income_category", check_fields=True)
     def validate_income_category(cls, income_category):
         if income_category not in feature_constants.INCOME_CATEGORIES:
-            raise pydantic.ValidationError()
+            raise ValueError("Invalid Income Category")
         return income_category
-
+    
     @pydantic.validator("education_category", check_fields=True)
     def validate_education_category(cls, education_category):
         if education_category not in feature_constants.EDUCATION_CATEGORIES:
-            raise pydantic.ValidationError()
+            raise ValueError("Invalid Education Category")
         return education_category
 
     @pydantic.validator("living_place", check_fields=True)
     def validate_living_place(cls, living_place):
         if living_place not in feature_constants.LIVING_PLACES:
-            raise pydantic.ValidationError() 
+            raise ValueError("Invalid Living Place")
         return living_place
 
-
+    
     def set_datatypes(self, dataframe: pandas.DataFrame) -> None:
         """
         Function sets datatypes for dataset features, according to it's possible range 
@@ -59,21 +66,23 @@ class CardApprovalFeatures(pydantic.BaseModel):
         Args:
             dataframe: target pandas.DataFrame object
         """
+        try:
+            dataframe['annual_income'] = dataframe['annual_income'].astype(numpy.float32)
+            dataframe['credit_window'] = dataframe['credit_window'].astype(numpy.float64)
+            dataframe['family_size'] = dataframe['family_size'].astype(numpy.int8)
+            dataframe['working_years'] = dataframe['working_years'].astype(numpy.int8)
+            dataframe['living_place'] = dataframe['living_place'].astype(numpy.int8)
+            dataframe['education_category'] = dataframe['education_category'].astype(numpy.int8)
 
-        dataframe['annual_income'] = dataframe['annual_income'].astype(numpy.float32)
-        dataframe['credit_window'] = dataframe['credit_window'].astype(numpy.float64)
-        dataframe['family_size'] = dataframe['family_size'].astype(numpy.int8)
-        dataframe['working_years'] = dataframe['working_years'].astype(numpy.int8)
-        dataframe['living_place'] = dataframe['living_place'].astype(numpy.int8)
-        dataframe['education_category'] = dataframe['education_category'].astype(numpy.int8)
+            dataframe["age"] = dataframe["age"].astype(numpy.int8)
 
-        dataframe["age"] = dataframe["age"].astype(numpy.int8)
+            # boolean fields
+            dataframe['has_contact_information'] = dataframe['has_contact_information'].astype(numpy.bool_)
+            dataframe['has_children'] = dataframe['has_children'].astype(numpy.bool_)
+            dataframe['owns_realty_and_car'] = dataframe['owns_realty_and_car'].astype(numpy.bool_)
 
-        # boolean fields
-        dataframe['has_contact_information'] = dataframe['has_contact_information'].astype(numpy.bool_)
-        dataframe['has_children'] = dataframe['has_children'].astype(numpy.bool_)
-        dataframe['owns_realty_and_car'] = dataframe['owns_realty_and_car'].astype(numpy.bool_)
- 
+        except Exception as err:
+            logger.error(err)
 
     def get_dataframe(self) -> pandas.DataFrame:
         """
@@ -83,11 +92,12 @@ class CardApprovalFeatures(pydantic.BaseModel):
         for feature, value in self.__dict__.items():
             df[feature] = [value]
 
-        self.set_datatypes(df)
-
-        df = self.__create_features(df) 
+        self.__create_features(df) 
         df = self.encoded_data(df)
-        df = df[feature_constants.FEATURE_ORDER]
+        self.set_datatypes(df)
+        
+        # sorting dataset to the original orderdsf
+        df = df[list(feature_constants.FEATURE_ORDER)]
         return df
 
     @staticmethod
@@ -95,20 +105,23 @@ class CardApprovalFeatures(pydantic.BaseModel):
         """
         Function creates additional features, based on the provided dataset
         """
+        try:
+            dataset['emp_stability'] = [features.create_emp_stability(
+                number_of_years=dataset['working_years'].iloc[0]
+            )]
 
-        dataset['emp_stability'] = features.create_emp_stability(
-            number_of_years=dataset['working_years']
-        )
-
-        dataset['owns_realty_and_car'] = features.create_owns_realty_and_car(
-            has_car=dataset['has_car'],
-            has_realty=dataset['has_realty']
-        )
- 
-        dataset['has_contact_information'] = features.create_contact_information(
-            has_phone_number=dataset['has_phone_number'],
-            has_email=dataset['has_email']
-        )
+            dataset['owns_realty_and_car'] = [features.create_owns_realty_and_car(
+                has_car=dataset['has_car'].iloc[0],
+                has_realty=dataset['has_realty'].iloc[0]
+            )]
+    
+            dataset['has_contact_information'] = [features.create_contact_information(
+                has_phone_number=dataset["has_phone_number"].iloc[0],
+                has_email=dataset['has_email'].iloc[0]
+            )]
+            
+        except Exception as err:
+            logger.error(err)
 
     @staticmethod
     def encoded_data(dataset: pandas.DataFrame) -> pandas.DataFrame:
@@ -123,6 +136,10 @@ class CardApprovalFeatures(pydantic.BaseModel):
         Returns:
             pandas.DataFrame object, containing encoded data
         """
-        enc_data = encoders.encode_dataset(dataset)
-        return enc_data
+        try:
+            enc_data = encoders.encode_dataset(dataset)
+            return enc_data
+        except Exception as err:
+            logger.error(err)
+            raise ValueError("Failed to encode dataset")
     
