@@ -20,7 +20,7 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -
         return fastapi.responses.JSONResponse(
             status_code=201,
             content={
-                "status": predicted_status
+                "status": int(predicted_status)
             }
         )
 
