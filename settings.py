@@ -6,6 +6,7 @@ except(ImportError, ModuleNotFoundError) as im_err:
     raise SystemExit("Failed to import critical startup modules, make sure they are installed.")
 
 logger = logging.getLogger(__name__)
+
 file_handler = logging.FileHandler(filename='./logs/startup.log')
 logger.addHandler(file_handler)
 
