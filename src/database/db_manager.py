@@ -1,26 +1,15 @@
 import db_settings, pandas
 import click 
-from src.offline_training import constants
+import constants
 import logging
+import sql_requests
 
 user_session = db_settings.get_user_session()
 Logger = logging.getLogger(__name__)
 
-file_handler = logging.FileHandler(filename="logs/db_manager.log")
+file_handler = logging.FileHandler(filename="../../logs/db_manager.log")
 Logger.addHandler(file_handler)
 
-sql_request = """
-    with randomized_applications as (
-        select *
-        from CustomerApplications order by random()
-    ),
-    samples as (
-        select * from randomized_applications limit :samples
-    )
-    
-    select * from samples s join CreditTransactions c 
-    on s.client_id = c.customer_id
-"""
 
 @click.command()
 @click.option("--samples", type=int, help="number of samples to load")
@@ -38,15 +27,25 @@ def load_datasets(samples: int):
     if samples == 0: return "Pass valid number of samples! Zero is not allowed"
     try:
         query_data = user_session.execute(
-            sql_request, {'samples': samples}
+            sql_requests.DATASET_LOAD_REQUEST, {'samples': samples}
         ).fetchall()
 
+        if len(query_data) == 0:
+            raise SystemExit(
+                "\n\n Your database is empty. Add some data \n\n"
+            )
+
         df = pandas.DataFrame(query_data)
-        credit_transactions = df[constants.CREDIT_TRANSACTIONS_FIELDS]
-        credit_applications = df[constants.CREDIT_APPLICATIONS_FIELDS]
+        credit_transactions = df[constants.TRANSACTION_TABLE_FIELDS]
+        credit_applications = df[constants.APPLICATION_TABLE_FIELDS]
         save_datasets(credit_applications, credit_transactions)
+        raise SystemExit(
+            "\n\n%s samples has been loaded and saved inside `raw_data` directory!\n\n"
+        )
+
     except Exception as exc:
         Logger.error(exc)
+        raise SystemExit("\n\nFailed to load data, check logs\n\n")
 
 def save_datasets(applications: pandas.DataFrame, transactions: pandas.DataFrame):
     """
