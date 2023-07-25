@@ -1,36 +1,23 @@
 import unittest.mock
-from src.database import db_controllers
+from src.database import db_manager
 import pandas
+import pytest 
 import typing
 
 
-def transaction_dataset() -> pandas.DataFrame:
+@pytest.fixture(scope="module")
+def dataset() -> typing.List:
     """
-    Function returns mocked transaction dataset for testing 
-    CREATE DB Controller
+    Function returns mocked raw dataset, parsed from database
     """
-
-
-def mocked_stratified_dataset() -> typing.Dict[str, typing.List]:
-    """
-    Function returns mocked data for training ML Models 
-    using Database user Session
-    """
-
-
-trans_dataset = transaction_dataset()
-strat_dataset = mocked_stratified_dataset()
-
 
 @unittest.mock.patch(target='src.database.db_controllers.user_session.execute')
-def test_create_new_transaction(mocked_session):
-    mocked_session.return_value = True
-    created = db_controllers.create_transaction()
-    assert created == True
+def test_dataset_loader(mocked_session):
+    mocked_session.return_value = dataset
+    created = db_manager.load_datasets(samples=10)
+    assert isinstance(created, str)
+    assert mocked_session.called_once()
 
-
-@unittest.mock.patch(target="src.database.db_controllers.user_session.execute")
-def test_databaset_loader(mocked_session):
-    mocked_session.returns_value = strat_dataset
-    data = db_controllers.get_records_dataset(samples_per_category=5)
+def test_fail_databaset_loader():
+    data = db_manager.load_datasets(samples=0)
     assert isinstance(data, pandas.DataFrame)
