@@ -2,7 +2,7 @@ try:
     import fastapi
     import os
     import logging
-except(ImportError, ModuleNotFoundError) as im_err:
+except (ImportError, ModuleNotFoundError) as im_err:
     raise SystemExit("Failed to import critical startup modules, make sure they are installed.")
 
 logger = logging.getLogger(__name__)
@@ -13,13 +13,13 @@ logger.addHandler(file_handler)
 try:
     import rest_controllers
     import exc_handlers 
-except(ImportError, ModuleNotFoundError) as imp_err:
+except (ImportError, ModuleNotFoundError) as imp_err:
     logger.critical({
         "name": imp_err.name,
         "exc_msg": imp_err.msg
     })
     raise SystemExit("Failed to import local packages, check logs for more info")
-    
+
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
 APPLICATION_HOST = os.environ.get("APPLICATION_HOST", "localhost")
 APPLICATION_PORT = int(os.environ.get("APPLICATION_PORT", "8080"))
@@ -45,7 +45,7 @@ try:
         exc_class_or_status_code=422,
         handler=exc_handlers.invalid_form_handler
     )
-except(AttributeError, ValueError, fastapi.exceptions.FastAPIError, ModuleNotFoundError) as exc:
+except (AttributeError, ValueError, fastapi.exceptions.FastAPIError, ModuleNotFoundError) as exc:
     logger.critical(exc_info={
         'name': exc.name,
         'type': exc.obj,

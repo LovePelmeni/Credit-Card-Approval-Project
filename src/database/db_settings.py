@@ -45,9 +45,6 @@ def update_configuration_file():
     config.set('alembic', 'sqlalchemy.url', DATABASE_URL) #Updating existing entry 
     config.write(alem_file.open("w"))
 
-update_configuration_file()
-
-
 
 def create_engine(database_url: str) -> Engine:
     """
@@ -68,9 +65,8 @@ def create_engine(database_url: str) -> Engine:
         return new_engine
     except(psycopg2.errors.ConnectionException) as err:
         Logger.critical(err)
-        raise RuntimeError("Database Connection Failure")
+        raise SystemExit("Database Connection Failure")
 
-new_engine = create_engine(DATABASE_URL) 
 
 def get_user_session() -> sessionmaker:
     """
@@ -85,20 +81,14 @@ def get_user_session() -> sessionmaker:
     except(psycopg2.errors.ProgrammingError, 
     psycopg2.errors.CannotConnectNow) as conn_err:
         Logger.critical(conn_err)
-        raise RuntimeError("Failed to get user session")
+        raise SystemExit("Failed to get user session")
 
-class DatabaseSession(object):
-    """
-    Standard Interface for database session
-    """
-    def __init__(self, session):
-        self.session = session 
 
-    def __enter__(self):
-        return self.session
 
-    def __exit__(self):
-        self.session.close()
+update_configuration_file()
+
+new_engine = create_engine(DATABASE_URL) 
+
 
 # Initializing basics ORM Table Abstraction 
 
