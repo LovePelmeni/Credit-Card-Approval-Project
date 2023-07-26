@@ -7,7 +7,7 @@
 <div class="container badges" 
 style="display: flex; justify-content: center; column-gap: 5px; margin-bottom: 30px">
 
-<a href="https://github.com/badges/shields/pulse" alt="Activity">
+<a href="https://github.com/LovePelmeni/Credit-Card-Approval-Project.git" alt="Activity">
         <img src="https://img.shields.io/badge/version-1.2.3-blue" /></a>
 
 <a href="https://github.com/badges/shields/pulse" alt="Activity">
