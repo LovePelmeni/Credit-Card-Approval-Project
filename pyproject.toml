@@ -18,6 +18,7 @@ autopep8 = "2.0.2"
 flake8 = "6.0.0"
 pandas = "^2.0.3"
 pytest = "^7.4.0"
+pdpbox = "^0.3.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "1.0.0"

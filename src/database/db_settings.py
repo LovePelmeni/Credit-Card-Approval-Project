@@ -6,8 +6,10 @@ import logging
 
 from pathlib import Path
 import configparser
+import os 
 
 Logger = logging.getLogger(__name__)
+
 
 DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
 DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
@@ -39,7 +41,9 @@ def update_configuration_file():
     current database url, that sqlalchemy use
     """
     config = configparser.ConfigParser()
-    alem_file = Path('alembic.ini')  #Path of your .ini file
+    full_path = os.path.join(os.path.abspath(os.curdir), "alembic.ini")
+    print(full_path)
+    alem_file = Path(full_path)  #Path of your .ini file
     config.read(alem_file)
 
     config.set('alembic', 'sqlalchemy.url', DATABASE_URL) #Updating existing entry 
@@ -59,6 +63,7 @@ def create_engine(database_url: str) -> Engine:
         Database Engine Object
     """
     try:
+        update_configuration_file()
         new_engine = create_sql_engine(
             url=database_url
         )
@@ -84,11 +89,7 @@ def get_user_session() -> sessionmaker:
         raise SystemExit("Failed to get user session")
 
 
-
-update_configuration_file()
-
 new_engine = create_engine(DATABASE_URL) 
-
 
 # Initializing basics ORM Table Abstraction 
 

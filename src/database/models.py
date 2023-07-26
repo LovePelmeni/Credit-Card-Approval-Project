@@ -1,4 +1,3 @@
-from calendar import c
 from sqlalchemy import Column, Integer, Boolean, String, Enum
 from sqlalchemy.orm import declarative_base
 import enum
