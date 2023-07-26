@@ -58,7 +58,7 @@ RUN pip install 'fastapi[all]' --upgrade
 
 # Giving acccess to the shell script
 RUN chmod +x ./entrypoint.sh
-RUN chmod +x ./database.env
+RUN chmod +x ./database.sh
 
 # Running entrypoint deployment script
 ENTRYPOINT ./entrypoint.sh

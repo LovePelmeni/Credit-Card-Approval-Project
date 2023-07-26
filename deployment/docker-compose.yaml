@@ -34,19 +34,14 @@ services:
 
   postgresql:
     container_name: database 
-    image: postgresql:latest 
+    image: postgres:latest 
     env_file: ../env/database.env
     ports:
       - "5434:5434"
     command:
       - -p 5434
-    heatlhcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "postgresql_database"]
-      retries: 5 
-      interval: 10s
-      timeout: 5s
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     networks:
       - project_network
 
@@ -60,7 +55,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: raj@nola.com
       PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin-data:/var/lib/pgadmin
     networks:
       - project_network
 
@@ -68,3 +63,12 @@ networks:
   project_network:
     external: True 
     name: "ml-network"
+
+volumes:
+
+  data:
+    driver: local 
+
+  pgadmin-data: 
+    driver: local
+    
