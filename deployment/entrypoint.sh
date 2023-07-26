@@ -15,7 +15,7 @@ autopep8 . --recursive --in-place
 
 echo "Checking Code Style using flake8..."
 
-flake8 .
+flake8 . --count --show-source --statistics
 
 if [ $? -ne 0 ]; then 
     echo "Codestyle Failed tests..."
@@ -23,6 +23,9 @@ if [ $? -ne 0 ]; then
 else
     echo "Codestyle is fine..."
 fi
+
+echo "Migration Process..."
+sh database.sh
 
 echo "Running Unittests..."
 

@@ -25,6 +25,7 @@ COPY  ./integration ./integration
 COPY  ./proj_requirements ./proj_requirements
 COPY  ./env ./env
 COPY  ./deployment/entrypoint.sh ./
+COPY  ./deployment/database.sh ./
 COPY  ./rest_controllers.py ./
 COPY  ./settings.py ./
 
@@ -57,6 +58,7 @@ RUN pip install 'fastapi[all]' --upgrade
 
 # Giving acccess to the shell script
 RUN chmod +x ./entrypoint.sh
+RUN chmod +x ./database.env
 
 # Running entrypoint deployment script
 ENTRYPOINT ./entrypoint.sh
