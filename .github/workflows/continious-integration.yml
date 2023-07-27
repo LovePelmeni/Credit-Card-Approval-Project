@@ -37,5 +37,3 @@ jobs:
         run: |
           docker push ${{env.DOCKER_IMAGE_TAG}}
           
-          
-          
