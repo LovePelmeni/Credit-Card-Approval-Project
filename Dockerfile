@@ -21,18 +21,22 @@ WORKDIR /project/dir/${ROOT_USER}
 COPY  ./src ./src
 COPY  ./__init__.py ./
 COPY  ./tests ./tests
-COPY  ./integration ./integration
 COPY  ./proj_requirements ./proj_requirements
 COPY  ./env ./env
 COPY  ./deployment/entrypoint.sh ./
 COPY  ./deployment/database.sh ./
 COPY  ./rest_controllers.py ./
+COPY  ./py_logging.py ./
 COPY  ./settings.py ./
+COPY  ./exc_handlers.py ./
 
 # Copying additional configuration files
 COPY ./tox.ini ./
 COPY ./pyproject.toml ./
 COPY ./poetry.lock ./
+
+# Creating directory for storing log files 
+RUN mkdir logs
 
 # Installing gcc compiler inside the image and updating repositories
 RUN apt-get update -y && apt-get install -y gcc

@@ -1,4 +1,3 @@
-import pytest
 from ...src.modeling import feature_form, exceptions
 from ...settings import application
 
@@ -41,14 +40,11 @@ def test_prediction_controller(test_client):
 
 
 def test_fail_prediction_controller(test_client):
-
-    dataset = load_valid_dataset()
-
     with unittest.mock.patch(
         target="src.modeling.modeling.CreditCardApprover.predict_card_approval",
         side_effect=exceptions.PredictionFailed,
-    ) as mocked_response:
-
+    ):
+        dataset = load_valid_dataset()
         response = test_client.post("/predict/card/approval/", content=dataset)
         assert hasattr(response, 'status_code')
         assert response.status_code == 400

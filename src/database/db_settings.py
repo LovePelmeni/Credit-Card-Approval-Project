@@ -1,6 +1,5 @@
 from sqlalchemy.engine import create_engine as create_sql_engine, Engine
 from sqlalchemy.orm import sessionmaker
-import os
 import psycopg2.errors
 import logging
 
@@ -15,11 +14,11 @@ if os.environ.get("TESTING_MODE", 1) == 0:
 else:
     Logger = logging.getLogger(__name__)
     
-DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
-DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
-DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "postgres")
-DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
-DATABASE_PORT = os.environ.get("DATABASE_PORT", "5434")
+DATABASE_NAME = os.environ.get("POSTGRES_NAME", "postgres")
+DATABASE_USER = os.environ.get("POSTGRES_USER", "postgres")
+DATABASE_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
+DATABASE_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+DATABASE_PORT = os.environ.get("POSTGRES_PORT", "5434")
 
 if not all(
     [
