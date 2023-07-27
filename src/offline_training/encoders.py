@@ -10,7 +10,6 @@ def encode_living_place_feature(feature_dataset: pandas.DataFrame):
     Args:
         dataset: pandas.DataFrame object, containing living_place feature
     """
-    print(feature_dataset)
     if 'living_place' not in feature_dataset.columns: return 
     encoder = OrdinalEncoder(dtype=numpy.int8, categories=[feature_constants.LIVING_PLACES])
     feature_dataset['living_place'] = encoder.fit_transform(feature_dataset[['living_place']])

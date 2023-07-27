@@ -19,6 +19,7 @@ flake8 = "6.0.0"
 pandas = "^2.0.3"
 pytest = "^7.4.0"
 pdpbox = "^0.3.0"
+psycopg2 = "^2.9.6"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "1.0.0"
@@ -37,11 +38,8 @@ pytest = "^7.4.0"
 
 [tool.pytest.ini_options]
 minversion = "7.4.0"
-add_opts = ""
-testpaths = [
-    "tests",
-    "integration"
-]
+addopts = "-s --junitxml=test_reports/report.xml"
+testpaths = ["tests"]
 
 [build-system]
 requires = ["poetry-core"]

@@ -7,10 +7,14 @@ from src.offline_training import encoders
 from src.offline_training import feature_constants
 from src.offline_training import features
 import logging 
+import os
 
-logger = logging.getLogger(__name__)
-file_handler = logging.FileHandler("./logs/feature_form.log")
-logger.addHandler(file_handler)
+if os.environ.get("TESTING_MODE", 1) == 0:
+    Logger = logging.getLogger(__name__)
+    file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
+    Logger.addHandler(file_handler)
+else:
+    Logger = logging.getLogger(__name__)
 
 class CardApprovalFeatures(pydantic.BaseModel):
 
@@ -82,7 +86,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
             dataframe['owns_realty_and_car'] = dataframe['owns_realty_and_car'].astype(numpy.bool_)
 
         except Exception as err:
-            logger.error(err)
+            Logger.error(err)
 
     def get_dataframe(self) -> pandas.DataFrame:
         """
@@ -121,7 +125,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
             )]
             
         except Exception as err:
-            logger.error(err)
+            Logger.error(err)
 
     @staticmethod
     def encoded_data(dataset: pandas.DataFrame) -> pandas.DataFrame:
@@ -140,7 +144,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
             enc_data = encoders.encode_dataset(dataset)
             return enc_data
         except Exception as err:
-            logger.error(err)
+            Logger.error(err)
             raise ValueError("Failed to encode dataset")
     
 

@@ -8,9 +8,13 @@ from pathlib import Path
 import configparser
 import os 
 
-Logger = logging.getLogger(__name__)
-
-
+if os.environ.get("TESTING_MODE", 1) == 0:
+    Logger = logging.getLogger(__name__)
+    file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
+    Logger.addHandler(file_handler)
+else:
+    Logger = logging.getLogger(__name__)
+    
 DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
 DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
 DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "postgres")
@@ -41,7 +45,7 @@ def update_configuration_file():
     current database url, that sqlalchemy use
     """
     config = configparser.ConfigParser()
-    full_path = os.path.join(os.path.abspath(os.curdir), "alembic.ini")
+    full_path = os.path.join("src/database", "alembic.ini")
     print(full_path)
     alem_file = Path(full_path)  #Path of your .ini file
     config.read(alem_file)
@@ -68,7 +72,7 @@ def create_engine(database_url: str) -> Engine:
             url=database_url
         )
         return new_engine
-    except(psycopg2.errors.ConnectionException) as err:
+    except Exception as err:
         Logger.critical(err)
         raise SystemExit("Database Connection Failure")
 

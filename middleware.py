@@ -7,7 +7,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*")
 cors_middleware = CORSMiddleware(
     allow_credentials=True,
     allow_headers="*",
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_origins=ALLOWED_HOSTS,
 )
 

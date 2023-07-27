@@ -72,5 +72,3 @@ class CustomerApplication(Model):
     OCCUPATION_TYPE = Column(String, nullable=False)
     DAYS_EMPLOYED = Column(String, nullable=False)
 
-
-

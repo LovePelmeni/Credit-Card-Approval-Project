@@ -35,16 +35,5 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -
                                               content={'error': 'server failed to predict status, internal error :('})
 
 
-def explain_rejection_reason(application_data: feature_form.CardApprovalForm):
-    """
-    Function returns reasons, why application might be rejected by the ML Model
-    
-    Args:
-        application_data: feature_form.CardApprovalForm - form, containing customer application data 
-    
-    Returns:
-        Array of objects "Explanation", containing rejection information
-    """
-
 def healthcheck(request: fastapi.requests.Request):
     return fastapi.responses.Response(status_code=200)

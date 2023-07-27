@@ -5,10 +5,14 @@ import numpy
 from . import exceptions
 import sklearn.exceptions
 import xgboost
+import os
 
-ModelLogger = logging.getLogger(__name__)
-file_handler = logging.FileHandler(filename="./logs/modeling.log")
-ModelLogger.addHandler(file_handler)
+if os.environ.get("TESTING_MODE", 1) == 0:
+    Logger = logging.getLogger(__name__)
+    file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
+    Logger.addHandler(file_handler)
+else:
+    Logger = logging.getLogger(__name__)
 
 class CreditCardApprover(object):
 
@@ -46,7 +50,7 @@ class CreditCardApprover(object):
 
         except (ValueError, AttributeError,
                 TypeError, sklearn.exceptions.NotFittedError) as err:
-            ModelLogger.error(err)
+            Logger.error(err)
             raise exceptions.PredictionFailed(msg=err.args)
 
 prediction_model = CreditCardApprover()

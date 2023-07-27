@@ -4,12 +4,16 @@ import click
 from src.database import constants
 import logging
 from src.database import sql_requests
+import os
 
 user_session = db_settings.get_user_session()
-Logger = logging.getLogger(__name__)
 
-file_handler = logging.FileHandler(filename="../../logs/db_manager.log")
-Logger.addHandler(file_handler)
+if os.environ.get("TESTING_MODE", 1) == 0:
+    Logger = logging.getLogger(__name__)
+    file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
+    Logger.addHandler(file_handler)
+else:
+    Logger = logging.getLogger(__name__)
 
 
 @click.command()

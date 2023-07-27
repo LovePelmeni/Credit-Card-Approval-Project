@@ -29,7 +29,7 @@ sh database.sh
 
 echo "Running Unittests..."
 
-pytest -s
+python -m pytest
 
 if [ $? -ne 0 ]; then
     echo "Unittests Failed"
