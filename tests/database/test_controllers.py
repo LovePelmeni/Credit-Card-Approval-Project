@@ -5,7 +5,6 @@ import pytest
 import typing
 import pytest
 
-
 @pytest.fixture(scope="module")
 def dataset() -> typing.List:
     """
@@ -13,13 +12,11 @@ def dataset() -> typing.List:
     """
     return []
 
-@unittest.mock.patch(target='src.database.db_controllers.user_session.execute')
-@unittest.mock.patch(target='src.database.db_settings.update_configuration_file')
-def test_dataset_loader(_, mocked_session):
-    mocked_session.return_value = dataset
+@unittest.mock.patch(target='src.database.db_settings.create_new_engine')
+def test_dataset_loader(mocked_engine):
     created = db_manager.load_datasets(samples=10)
     assert isinstance(created, str)
-    assert mocked_session.called_once()
+    assert mocked_engine.called_once()
 
 
 def test_fail_databaset_loader():

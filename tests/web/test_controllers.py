@@ -8,8 +8,24 @@ import unittest.mock
 import pydantic
 
 
-def load_valid_dataset() -> pydantic.BaseModel:
-    return feature_form.CardApprovalFeatures()
+def load_valid_dataset() -> feature_form.CardApprovalFeatures:
+    """
+    Function returns example of mocked feature form 
+    for testing ML Algorithm
+    """
+    return feature_form.CardApprovalFeatures(
+        annual_income=1000000,
+        credit_window=10,
+        family_size=3,
+        income_category="Working",
+        has_car=True,
+        has_realty=True,
+        has_children=False,
+        has_email=True,
+        education_category="Higher education",
+        age=25,
+        working_years=6
+    )
 
 
 @pytest.fixture(scope='module')

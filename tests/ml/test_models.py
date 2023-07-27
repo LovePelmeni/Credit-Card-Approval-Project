@@ -2,7 +2,6 @@ import pandas
 from ...src.modeling import feature_form, modeling
 import numpy
 import unittest
-import pydantic
 
 
 def main_dataset() -> pandas.DataFrame:

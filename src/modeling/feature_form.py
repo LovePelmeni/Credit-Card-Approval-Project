@@ -40,19 +40,19 @@ class CardApprovalFeatures(pydantic.BaseModel):
 
     # Field Validators
 
-    @pydantic.validator("income_category", check_fields=True)
+    @pydantic.field_validator("income_category")
     def validate_income_category(cls, income_category):
         if income_category not in feature_constants.INCOME_CATEGORIES:
             raise ValueError("Invalid Income Category")
         return income_category
     
-    @pydantic.validator("education_category", check_fields=True)
+    @pydantic.field_validator("education_category", check_fields=True)
     def validate_education_category(cls, education_category):
         if education_category not in feature_constants.EDUCATION_CATEGORIES:
             raise ValueError("Invalid Education Category")
         return education_category
 
-    @pydantic.validator("living_place", check_fields=True)
+    @pydantic.field_validator("living_place", check_fields=True)
     def validate_living_place(cls, living_place):
         if living_place not in feature_constants.LIVING_PLACES:
             raise ValueError("Invalid Living Place")
@@ -143,3 +143,4 @@ class CardApprovalFeatures(pydantic.BaseModel):
             logger.error(err)
             raise ValueError("Failed to encode dataset")
     
+
