@@ -15,7 +15,7 @@ services:
   
   application:
     container_name: ml_application 
-    build: ../
+    image: crazycoderrr/credit_card_application:latest
     env_file: 
       - ../env/proj.env
       - ../env/database.env

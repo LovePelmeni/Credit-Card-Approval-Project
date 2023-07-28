@@ -1,9 +1,9 @@
-from src.database import db_settings
+import db_settings
 import pandas
 import click 
-from src.database import constants
+import constants
 import logging
-from src.database import sql_requests
+import sql_requests
 import os
 
 user_session = db_settings.get_user_session()

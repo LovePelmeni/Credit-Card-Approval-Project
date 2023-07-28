@@ -27,6 +27,8 @@ fi
 echo "Migration Process..."
 sh database.sh
 
+if [ $? -ne 0 ]; then exit 1; fi;
+
 echo "Running Unittests..."
 
 python -m pytest

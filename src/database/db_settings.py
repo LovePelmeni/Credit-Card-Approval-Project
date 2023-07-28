@@ -7,18 +7,22 @@ from pathlib import Path
 import configparser
 import os 
 
-if os.environ.get("TESTING_MODE", 1) == 0:
+if os.environ.get("TESTING_MODE", "0") == "0": # in case TESTING MODE is turned off
     Logger = logging.getLogger(__name__)
     file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
     Logger.addHandler(file_handler)
+    ALEMBIC_PATH = "alembic.ini"
 else:
     Logger = logging.getLogger(__name__)
+    ALEMBIC_PATH = os.path.join("src/database", "alembic.ini")
     
 DATABASE_NAME = os.environ.get("POSTGRES_NAME", "postgres")
 DATABASE_USER = os.environ.get("POSTGRES_USER", "postgres")
 DATABASE_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
 DATABASE_HOST = os.environ.get("POSTGRES_HOST", "localhost")
 DATABASE_PORT = os.environ.get("POSTGRES_PORT", "5434")
+
+print(DATABASE_HOST, DATABASE_PORT)
 
 if not all(
     [
@@ -44,9 +48,8 @@ def update_configuration_file():
     current database url, that sqlalchemy use
     """
     config = configparser.ConfigParser()
-    full_path = os.path.join("src/database", "alembic.ini")
-    print(full_path)
-    alem_file = Path(full_path)  #Path of your .ini file
+    print('current_alembic_path:', ALEMBIC_PATH)
+    alem_file = Path(ALEMBIC_PATH)  #Path of your .ini file
     config.read(alem_file)
 
     config.set('alembic', 'sqlalchemy.url', DATABASE_URL) #Updating existing entry 
