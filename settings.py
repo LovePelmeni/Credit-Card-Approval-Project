@@ -3,12 +3,12 @@ try:
     import os
     import logging
     from fastapi.middleware.cors import CORSMiddleware
+    import logging
 
 except (ImportError, ModuleNotFoundError):
     raise SystemExit("Failed to import critical startup modules, make sure they are installed.")
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*")
-
 logger = logging.getLogger(__name__)
 
 file_handler = logging.FileHandler(filename='./logs/startup.log')
@@ -19,9 +19,7 @@ try:
     import exc_handlers 
     import py_logging
 except (ImportError, ModuleNotFoundError) as imp_err:
-    logger.critical({
-        "name": imp_err.name
-    })
+    logger.critical(imp_err)
     raise SystemExit("Failed to import local packages, check logs for more info")
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
