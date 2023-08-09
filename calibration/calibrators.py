@@ -23,7 +23,6 @@ class TrainingCalibrationDataset(pydantic.BaseModel):
     """
     decision_scores: typing.List[float]
     true_classes: typing.List[int]
-
 class PlattScaling(object):
     """
     Platt Scaling Calibration Algorithm Implementation
@@ -97,6 +96,7 @@ class PlattScaling(object):
             sklearn.exceptions.NotFittedError,
         ) as err:
             Logger.error(err)
+            raise err
         
 
     def predict(self, decision_scores: typing.List[float]):
