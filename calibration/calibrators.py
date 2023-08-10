@@ -125,4 +125,3 @@ def get_calibration_error(
         actual_bins[index] = numpy.mean(true_classes[sorted_preds[current:next_]])
         bin_sample_counts[index] = true_classes[sorted_preds[current:next_]].shape[0]
     return predicted_bins,actual_bins,bin_sample_counts
-

@@ -67,10 +67,8 @@ networks:
     name: "ml-network"
 
 volumes:
-
   data:
     driver: local 
-
   pgadmin-data: 
     driver: local
     

@@ -1,60 +1,62 @@
 apiVersion: v1
 kind: Service 
 metadata:
-  - name: ml-application-service 
-    namespace: ml_namespace 
+  name: ml-application-service 
+  namespace: ml-namespace 
 spec:
   selector:
-    app: ml_app
+    app: ml-app
   ports:
-    - containerPort: 7000
+    - name: http
+      port: 7000
       targetPort: 8080
-
+      protocol: TCP
+      
 ---
 
-apiVersion: apps/v1
-kind: Deployment
-namespace:
-  - name: ml_namespace 
-    labels:
-      app: ml_app
+apiVersion: v1
+kind: Deployment 
+metadata:
+  name: application-deployment 
+  namespace: app-namespace 
 spec:
   selector:
     matchLabels:
-      app: ml_app 
-  templates:
-    labels:
-      app: ml_app 
+      app: application-service 
+  template:
+    metadata:
+      labels:
+        app: application-service 
     spec:
-       volumes:
-        - name: nginx-conf 
-          configMap:
-            name: nginx-conf 
-            items:
-              - key: nginx.conf
-                path: nginx.conf
-      initContainers:
-        - name: nginx_application_server
-          image: nginx:latest
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-              targetPort: 80
+      volumes: 
+        - name: nginx-configuration-map 
+          configMap: 
+            - name: nginx-configuration-map 
+              items:
+                - key: nginx.conf 
+                  subPath: nginx.conf 
 
+      initContainers: 
+        - name: nginx-server 
+          image: nginx 
           volumeMounts:
-            - mountPath: /etc/nginx/
-              name: nginx-conf
-          imagePullPolicy: IfNotPresent
-
-      containers:
-        - name: ml_application
-          image: crazycoderrr/news_classification_app:latest 
+            - name: nginx-configuration-map
+              subPath: nginx.conf 
+              path: /etc/nginx/nginx.conf
+              readOnly: true
           ports:
             - containerPort: 8000
-              protocol: TCP
-          envFrom:
-            configMapRef:
-              - name: ml-application-map 
+              protocol: TCP 
+          imagePullPolicy: IfNotPresent
 
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: application-container 
+          image: crazycoderrr/credit_card_application:latest
+          ports:
+            - containerPort: 8001
+              protocol: TCP 
+          envFrom:
+            - configMapRef:
+                - name: ml-application-map
           imagePullPolicy: IfNotPresent 
-          terminationGracePeriodSeconds: 60
