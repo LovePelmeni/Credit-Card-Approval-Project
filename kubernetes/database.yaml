@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: StatefulSet
+metadata:
+  name: ml-database 
+  labels:
+    app: ml_db
+namespace:
+  - name: ml_namespace 
+spec:
+  selector:
+    matchLabels:
+      app: ml_db 
+  templates:
+    metadata:
+      labels: ml_db
+    spec:
+      containers:
+        - name: database
+          image: postgres:latest 
+          ports:
+            - containerPort: 5432 
+              protocol: TCP
+          imagePullPolicy: IfNotPresent 
+          terminationGracePeriodSeconds: 60
+          envFrom:
+            secretRef:
+              - name: ml-database-map
+          
+        

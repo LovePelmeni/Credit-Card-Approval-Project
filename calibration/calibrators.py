@@ -4,7 +4,7 @@ import typing
 from sklearn.linear_model import LogisticRegression
 import logging 
 import sklearn.exceptions
-from sklearn.metrics import roc_auc_score, f1_score
+import numpy 
 
 Logger = logging.getLogger("calibration_logger")
 file_handler = logging.FileHandler(filename="/logs/calibrators.log")
@@ -12,17 +12,18 @@ Logger.addHandler(Logger)
 
 class CalibrationError(Exception):
     """
-    Exception, once calibration fails
+    Exception, once calibration process fails
     """
     def __init__(self, msg=None):
         self.msg = msg
-class TrainingCalibrationDataset(pydantic.BaseModel):
+class CalibrationDataset(pydantic.BaseModel):
     """
     Class reprensents Calibration Dataset for training Platt Scaling 
     algorithm 
     """
     decision_scores: typing.List[float]
     true_classes: typing.List[int]
+
 class PlattScaling(object):
     """
     Platt Scaling Calibration Algorithm Implementation
@@ -32,10 +33,7 @@ class PlattScaling(object):
         self.trained: bool = False
   
     def train(self, 
-            train_decision_scores: pandas.Series,
-            train_true_classes: pandas.Series, 
-            test_decision_scores: pandas.Series,
-            test_true_classes: pandas.Series
+            train_dataset: CalibrationDataset,
         ):
         """
         Function trains log scaler for calibrating probabilities
@@ -54,37 +52,11 @@ class PlattScaling(object):
             f1_score - score estimation of given values
         """
         try:
-            train_dataset = TrainingCalibrationDataset(
-                decision_scores=train_decision_scores,
-                true_classes=train_true_classes
-            )
-
-            test_dataset = TrainingCalibrationDataset(
-                decision_scores=test_decision_scores,
-                true_classes=test_true_classes
-            )
-
             self.log_scaler.fit(
                 pandas.Series(train_dataset.decision_scores),
                 pandas.Series(train_dataset.true_classes),
             )
-
-            predicted_values = self.log_scaler.predict(
-                pandas.Series(test_dataset.decision_scores)
-            )
-
-            # Estimaing Performance of the model 
-            roc_auc = roc_auc_score(
-                test_dataset.true_classes,
-                predicted_values
-            )
-            
-            f1_scoring = f1_score(
-                test_dataset.true_classes,
-                predicted_values
-            )
             self.trained = True
-            return predicted_values, (roc_auc, f1_scoring)
 
         except(
             sklearn.exceptions.DataConversionWarning,
@@ -99,7 +71,7 @@ class PlattScaling(object):
             raise err
         
 
-    def predict(self, decision_scores: typing.List[float]):
+    def get_calibrated_prob(self, decision_scores: typing.List[float]):
         """
         Function predict calibrated values 
         using trained Logistic Regression Scaler function
@@ -108,9 +80,49 @@ class PlattScaling(object):
             decision_scores: typing.List[float] - training
 
         Returns:
-            predicted binary classes of the decision scores
+            predicted probability of the calibrated function
         """
         if self.trained == False: 
             raise ValueError('You need to train Platt Scaling before predicting values.')
-        predicted_probs = self.log_scaler.predict(decision_scores)
+        predicted_probs = self.log_scaler.predict_proba(decision_scores)[:, 1].tolist()
         return predicted_probs
+
+
+def get_calibration_error(
+    true_classes: numpy.ndarray,
+    preds: numpy.ndarray[numpy.ndarray[float]],
+    bins: int = 1000):
+    """
+    Function calculates Expected Calibraiton Error (ECE) 
+    for a given set of probabilities and true classes
+
+    Args:
+        true_classes: numpy.ndarray - true binary classes 
+        preds: numpy.ndarray - predicted binary classes
+        bins: int - number of bins to split the data
+
+    Returns:
+        - predicted_bins - (bins with their predicted values)
+        - actual_bins - (bins with their actual values)
+        - sample_counts - (number of samples in each bin)
+    """
+    if true_classes.shape[0] != preds.shape[0]:
+        raise ValueError("Args does not have equal lengths")
+
+    if true_classes.shape[0] == 0: 
+        raise ValueError("Passed empty dataset")
+
+    sorted_preds = numpy.argsort(preds)
+    predicted_bins = [[] for _ in range(bins)]
+    actual_bins = [[] for _ in range(bins)]
+    bin_sample_counts = [[] for _ in range(bins)]
+    step = 1.*true_classes.shape[0]/bins
+
+    for index in range(bins):
+        current = int(step*index)
+        next_ = int(step*(index+1))
+        predicted_bins[index] = numpy.mean(predicted_bins[sorted_preds[current:next_]])
+        actual_bins[index] = numpy.mean(true_classes[sorted_preds[current:next_]])
+        bin_sample_counts[index] = true_classes[sorted_preds[current:next_]].shape[0]
+    return predicted_bins,actual_bins,bin_sample_counts
+

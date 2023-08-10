@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  - name: ml-application-service 
+    namespace: ml_namespace 
+spec:
+  selector:
+    app: ml_app
+  ports:
+    - containerPort: 7000
+      targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+namespace:
+  - name: ml_namespace 
+    labels:
+      app: ml_app
+spec:
+  selector:
+    matchLabels:
+      app: ml_app 
+  templates:
+    labels:
+      app: ml_app 
+    spec:
+       volumes:
+        - name: nginx-conf 
+          configMap:
+            name: nginx-conf 
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+      initContainers:
+        - name: nginx_application_server
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              targetPort: 80
+
+          volumeMounts:
+            - mountPath: /etc/nginx/
+              name: nginx-conf
+          imagePullPolicy: IfNotPresent
+
+      containers:
+        - name: ml_application
+          image: crazycoderrr/news_classification_app:latest 
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            configMapRef:
+              - name: ml-application-map 
+
+          imagePullPolicy: IfNotPresent 
+          terminationGracePeriodSeconds: 60
