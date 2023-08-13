@@ -3,6 +3,7 @@ from ...src.modeling import feature_form, modeling
 from ...src.offline_training import feature_constants
 import numpy
 
+
 def main_dataset() -> pandas.DataFrame:
     dataset = {
         'credit_window': numpy.random.choice(a=numpy.arange(start=1, stop=1000), size=6),
@@ -21,6 +22,7 @@ def main_dataset() -> pandas.DataFrame:
     }
 
     return pandas.DataFrame(data=dataset)
+
 
 def invalid_dataset() -> pandas.DataFrame:
     dataset = {
@@ -43,6 +45,7 @@ def invalid_dataset() -> pandas.DataFrame:
 
 dataset = main_dataset()
 inv_dataset = invalid_dataset()
+
 
 def test_prediction_model():
 

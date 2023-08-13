@@ -20,7 +20,8 @@ try:
     import py_logging
 except (ImportError, ModuleNotFoundError) as imp_err:
     logger.critical(imp_err)
-    raise SystemExit("Failed to import local packages, check logs for more info")
+    raise imp_err
+    # raise SystemExit("Failed to import local packages, check logs for more info")
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", True)
 APPLICATION_HOST = os.environ.get("APPLICATION_HOST", "localhost")

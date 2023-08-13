@@ -7,12 +7,17 @@ import sklearn.exceptions
 import numpy 
 
 Logger = logging.getLogger("calibration_logger")
+
+
 class CalibrationError(Exception):
     """
     Exception, once calibration process fails
     """
+
     def __init__(self, msg=None):
         self.msg = msg
+
+
 class CalibrationDataset(pydantic.BaseModel):
     """
     Class reprensents Calibration Dataset for training Platt Scaling 
@@ -27,20 +32,22 @@ class CalibrationDataset(pydantic.BaseModel):
             "true_classes": self.true_classes
         })
 
+
 class PlattScaling(object):
     """
     Platt Scaling Calibration Algorithm Implementation
     """
+
     def __init__(self):
         self.log_scaler = LogisticRegression()
         self.trained: bool = False
-  
+
     def train(self, 
-            train_dataset: CalibrationDataset,
-        ):
+              train_dataset: CalibrationDataset,
+              ):
         """
         Function trains log scaler for calibrating probabilities
-        
+
         Args:
             train_dataset: pandas.Series - training calibration dataset
             test_dataset: pandas.Series - testing calibration dataset
@@ -48,7 +55,7 @@ class PlattScaling(object):
         NOTE:
             train and test arguments should be from 2 independent
             datasets, otherwise model can end up being overfitted
-        
+
         Returns:
             predicted_values - predicted values from actual given probs
             roc_auc - ROC AUC score estimation of given values 
@@ -64,24 +71,23 @@ class PlattScaling(object):
             )
             self.trained = True
 
-        except(
+        except (
             sklearn.exceptions.DataConversionWarning,
             sklearn.exceptions.DataDimensionalityWarning,
         ) as training_err:
             Logger.warn(training_err)
 
-        except(
+        except (
             sklearn.exceptions.NotFittedError,
         ) as err:
             Logger.error(err)
             raise err
-        
 
     def get_calibrated_prob(self, decision_scores: typing.List[float]) -> numpy.ndarray:
         """
         Function predict calibrated values 
         using trained Logistic Regression Scaler function
-        
+
         Args:
             decision_scores: typing.List[float] - training
 
@@ -96,9 +102,9 @@ class PlattScaling(object):
 
 
 def get_calibration_error(
-    y_true: pandas.Series,
-    y_pred: pandas.Series,
-    num_bins: int = 1000):
+        y_true: pandas.Series,
+        y_pred: pandas.Series,
+        num_bins: int = 1000):
     """
     Function calculates Expected Calibraiton Error (ECE) 
     for a given set of probabilities and true classes
@@ -140,7 +146,7 @@ def get_calibration_error(
         pred_probs.append(numpy.mean(predictions[pred_bins]))
         actual_probs.append(numpy.mean(accuracies[pred_bins]))
         samples.append(indices.shape[0])
-        
+
         ece += (
             (samples[-1] / total_samples) * numpy.abs(pred_probs[-1] - actual_probs[-1])
         )

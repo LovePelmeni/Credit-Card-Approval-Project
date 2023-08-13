@@ -3,6 +3,7 @@ import pandas
 import matplotlib.pyplot as plt 
 from calibration import calibrators
 
+
 def calibration_plot(
     y_true: pandas.Series,
     y_pred: pandas.Series,
@@ -23,7 +24,7 @@ def calibration_plot(
         y_pred=y_pred,
         num_bins=bins
     )
-    
+
     # building scatter dependency plot
     plt.scatter(
         x=pred_probs,
