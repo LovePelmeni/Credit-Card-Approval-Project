@@ -1,7 +1,7 @@
 from sklearn.preprocessing import OrdinalEncoder
 import pandas
 import numpy
-from . import feature_constants
+from offline_training import feature_constants
 
 def encode_living_place_feature(feature_dataset: pandas.DataFrame):
     """
@@ -49,3 +49,4 @@ def encode_dataset(merged_dataset: pandas.DataFrame):
     encode_income_category(merged_dataset)
     encode_education_category(merged_dataset)
     return merged_dataset
+    

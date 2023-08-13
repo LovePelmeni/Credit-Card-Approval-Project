@@ -7,9 +7,6 @@ import sklearn.exceptions
 import numpy 
 
 Logger = logging.getLogger("calibration_logger")
-file_handler = logging.FileHandler(filename="/logs/calibrators.log")
-Logger.addHandler(Logger)
-
 class CalibrationError(Exception):
     """
     Exception, once calibration process fails
@@ -23,6 +20,12 @@ class CalibrationDataset(pydantic.BaseModel):
     """
     decision_scores: typing.List[float]
     true_classes: typing.List[int]
+
+    def get_dataframe(self) -> pandas.DataFrame:
+        return pandas.DataFrame({
+            "decision_scores": self.decision_scores,
+            "true_classes": self.true_classes
+        })
 
 class PlattScaling(object):
     """
@@ -52,9 +55,12 @@ class PlattScaling(object):
             f1_score - score estimation of given values
         """
         try:
+            df = train_dataset.get_dataframe()
+            indep = df.drop(columns=['true_classes'])
+            dep = df['true_classes']
             self.log_scaler.fit(
-                pandas.Series(train_dataset.decision_scores),
-                pandas.Series(train_dataset.true_classes),
+                indep,
+                dep,
             )
             self.trained = True
 
@@ -71,7 +77,7 @@ class PlattScaling(object):
             raise err
         
 
-    def get_calibrated_prob(self, decision_scores: typing.List[float]):
+    def get_calibrated_prob(self, decision_scores: typing.List[float]) -> numpy.ndarray:
         """
         Function predict calibrated values 
         using trained Logistic Regression Scaler function
@@ -84,17 +90,19 @@ class PlattScaling(object):
         """
         if self.trained == False: 
             raise ValueError('You need to train Platt Scaling before predicting values.')
-        predicted_probs = self.log_scaler.predict_proba(decision_scores)[:, 1].tolist()
+        df = pandas.DataFrame({'decision_scores': decision_scores})
+        predicted_probs = self.log_scaler.predict_proba(df)[:, 1]
         return predicted_probs
 
 
 def get_calibration_error(
-    true_classes: numpy.ndarray,
-    preds: numpy.ndarray[numpy.ndarray[float]],
-    bins: int = 1000):
+    y_true: pandas.Series,
+    y_pred: pandas.Series,
+    num_bins: int = 1000):
     """
     Function calculates Expected Calibraiton Error (ECE) 
     for a given set of probabilities and true classes
+    using Multiclass Classification Approach
 
     Args:
         true_classes: numpy.ndarray - true binary classes 
@@ -106,22 +114,35 @@ def get_calibration_error(
         - actual_bins - (bins with their actual values)
         - sample_counts - (number of samples in each bin)
     """
-    if true_classes.shape[0] != preds.shape[0]:
+    if y_true.shape[0] != y_pred.shape[0]:
         raise ValueError("Args does not have equal lengths")
 
-    if true_classes.shape[0] == 0: 
+    if y_true.shape[0] == 0: 
         raise ValueError("Passed empty dataset")
 
-    sorted_preds = numpy.argsort(preds)
-    predicted_bins = [[] for _ in range(bins)]
-    actual_bins = [[] for _ in range(bins)]
-    bin_sample_counts = [[] for _ in range(bins)]
-    step = 1.*true_classes.shape[0]/bins
+    ece = 0.0
 
-    for index in range(bins):
-        current = int(step*index)
-        next_ = int(step*(index+1))
-        predicted_bins[index] = numpy.mean(predicted_bins[sorted_preds[current:next_]])
-        actual_bins[index] = numpy.mean(true_classes[sorted_preds[current:next_]])
-        bin_sample_counts[index] = true_classes[sorted_preds[current:next_]].shape[0]
-    return predicted_bins,actual_bins,bin_sample_counts
+    pred_probs = []
+    actual_probs = [] 
+    samples = [] 
+
+    sorted_preds = numpy.argsort(y_pred)
+    bin_indices = numpy.array_split(sorted_preds, num_bins)
+    total_samples = y_true.shape[0]
+
+    pred_classes = (y_pred >= 0.5).astype(int).to_numpy()
+    predictions = y_pred.to_numpy()
+    accuracies = (y_true == pred_classes).astype(int).to_numpy()
+
+    for indices in bin_indices:
+
+        pred_bins = sorted_preds[indices]
+        pred_probs.append(numpy.mean(predictions[pred_bins]))
+        actual_probs.append(numpy.mean(accuracies[pred_bins]))
+        samples.append(indices.shape[0])
+        
+        ece += (
+            (samples[-1] / total_samples) * numpy.abs(pred_probs[-1] - actual_probs[-1])
+        )
+
+    return pred_probs, actual_probs, ece
