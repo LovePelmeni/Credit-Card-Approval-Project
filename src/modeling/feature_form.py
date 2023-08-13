@@ -103,7 +103,7 @@ class CardApprovalFeatures(pydantic.BaseModel):
         df = self.encoded_data(df)
         self.set_datatypes(df)
         
-        # sorting dataset to the original orderdsf
+        # sorting dataset to the original order
         df = df[list(feature_constants.FEATURE_ORDER)]
         return df
 
@@ -149,4 +149,3 @@ class CardApprovalFeatures(pydantic.BaseModel):
         except Exception as err:
             Logger.error(err)
             raise ValueError("Failed to encode dataset")
-    

@@ -1,12 +1,18 @@
 try:
     import fastapi
     import os
+    import sys
     import logging
     from fastapi.middleware.cors import CORSMiddleware
     import logging
 
 except (ImportError, ModuleNotFoundError):
     raise SystemExit("Failed to import critical startup modules, make sure they are installed.")
+
+try:
+    sys.path.append("src")
+except Exception as err:
+    raise SystemExit("Failed to set global paths for the Model")
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*")
 logger = logging.getLogger(__name__)

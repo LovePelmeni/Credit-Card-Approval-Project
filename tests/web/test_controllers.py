@@ -23,7 +23,7 @@ def load_valid_dataset() -> feature_form.CardApprovalFeatures:
         education_category="Higher education",
         age=25,
         working_years=6,
-        living_place="Office apartment"
+        living_place="Office apartment",
     )
 
 

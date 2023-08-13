@@ -8,7 +8,6 @@ import numpy
 
 Logger = logging.getLogger("calibration_logger")
 
-
 class CalibrationError(Exception):
     """
     Exception, once calibration process fails
@@ -16,7 +15,6 @@ class CalibrationError(Exception):
 
     def __init__(self, msg=None):
         self.msg = msg
-
 
 class CalibrationDataset(pydantic.BaseModel):
     """
@@ -31,7 +29,6 @@ class CalibrationDataset(pydantic.BaseModel):
             "decision_scores": self.decision_scores,
             "true_classes": self.true_classes
         })
-
 
 class PlattScaling(object):
     """
@@ -94,12 +91,15 @@ class PlattScaling(object):
         Returns:
             predicted probability of the calibrated function
         """
-        if self.trained == False: 
-            raise ValueError('You need to train Platt Scaling before predicting values.')
-        df = pandas.DataFrame({'decision_scores': decision_scores})
-        predicted_probs = self.log_scaler.predict_proba(df)[:, 1]
-        return predicted_probs
-
+        try:
+            if self.trained == False: 
+                raise ValueError('You need to train Platt Scaling before predicting values.')
+            df = pandas.DataFrame({'decision_scores': decision_scores})
+            predicted_probs = self.log_scaler.predict_proba(df)[:, 1]
+            return predicted_probs
+        except Exception as pred_err:
+            Logger.error(pred_err)
+            raise CalibrationError(msg=pred_err)
 
 def get_calibration_error(
         y_true: pandas.Series,

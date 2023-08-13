@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 handler = logging.FileHandler(filename="./logs/rest_controllers.log")
 logger.addHandler(handler)
 
-
 def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -> Response:
     """
     Function predicts whether client would be allowed to have a credit card or not 
@@ -37,3 +36,4 @@ def predict_card_approval(application_data: feature_form.CardApprovalFeatures) -
 
 def healthcheck(request: fastapi.requests.Request):
     return fastapi.responses.Response(status_code=200)
+

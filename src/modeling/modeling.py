@@ -10,9 +10,9 @@ import pickle
 from calibration import calibrators
 import typing 
 
-if os.environ.get("TESTING_MODE", 1) == 0:
+if os.environ.get("TESTING_MODE", 0) == 0:
     Logger = logging.getLogger(__name__)
-    file_handler = logging.FileHandler(filename="../../logs/db_settings.log")
+    file_handler = logging.FileHandler(filename="logs/modeling.log")
     Logger.addHandler(file_handler)
 else:
     Logger = logging.getLogger(__name__)
@@ -61,10 +61,12 @@ class CreditCardApprover(object):
         """
         try:
             enc_data = features.get_dataframe()
-            pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0][1]
+            pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0, 1]
+     
             calibrated_prob = self.__calibrator.get_calibrated_prob(
                 decision_scores=[pos_prob]
             )
+
             predicted_status = (
                 calibrated_prob >= self.__decision_threshold
             ).astype(int)
