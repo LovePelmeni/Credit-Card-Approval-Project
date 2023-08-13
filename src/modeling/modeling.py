@@ -6,6 +6,9 @@ from . import exceptions
 import sklearn.exceptions
 import xgboost
 import os
+import pickle
+from calibration import calibrators
+import typing 
 
 if os.environ.get("TESTING_MODE", 1) == 0:
     Logger = logging.getLogger(__name__)
@@ -22,12 +25,27 @@ class CreditCardApprover(object):
     """
 
     def __init__(self):
+
         self.__model = xgboost.XGBClassifier()
+        self.__calibrator: typing.Union[None, calibrators.PlattScaling] = None
+
         self.__decision_threshold = constants.DECISION_THRESHOLD
         self.__load_model()
+        self.__load_calibrator()
 
     def __load_model(self):
+        """
+        Function loads XgBoost Classifier model from the File Path 
+        specified at 'constants' module 
+        """
         self.__model.load_model(fname=constants.MODEL_CLASSIFIER_URL)
+
+    def __load_calibrator(self):
+        """
+        Function loads Calibrator Classifier model form File Path 
+        specified at 'constants' module
+        """
+        self.__calibrator = pickle.load(open(constants.CALIBRATOR_CLASSIFIER_URL, mode="rb"))
 
     def predict_card_approval(self, features: feature_form.CardApprovalFeatures):
         """
@@ -44,8 +62,13 @@ class CreditCardApprover(object):
         try:
             enc_data = features.get_dataframe()
             pos_prob = numpy.array(self.__model.predict_proba(enc_data))[0][1]
+            calibrated_prob = self.__calibrator.get_calibrated_prob(
+                decision_scores=[pos_prob]
+            )
             predicted_status = (
-                pos_prob >= self.__decision_threshold).astype(int)
+                calibrated_prob >= self.__decision_threshold
+            ).astype(int)
+            
             return predicted_status
 
         except (ValueError, AttributeError,
