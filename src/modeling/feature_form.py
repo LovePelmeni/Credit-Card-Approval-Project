@@ -6,6 +6,7 @@ import pandas.errors
 from src.offline_training import encoders 
 from src.offline_training import feature_constants
 from src.offline_training import features
+
 import logging 
 import os
 
@@ -147,4 +148,3 @@ class CardApprovalFeatures(pydantic.BaseModel):
             Logger.error(err)
             raise ValueError("Failed to encode dataset")
     
-
