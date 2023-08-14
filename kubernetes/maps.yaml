@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: ml-application-map
+  namespace: ml-namespace
+data:
+  APPLICATION_HOST: "localhost"
+  APPLICATION_PORT: "8000"
+  DEBUG: "False"
+
+---
+
+apiVersion: v1
+kind: ConfigMap 
+metadata:
+  name: nginx-config-map
+  namespace: ml-namespace 
+data:
+  nginx.conf: | 
+
+      events {
+        worker_connections 1024;
+      }
+
+      http {
+        upstream application_upstream {
+          server ml_application:8000;
+        }
+        server {
+          listen 80;
+          location / {
+            proxy_pass http://application_upstream;
+            proxy_set_header Host $http_host;
+            proxy_set_header Upgrade $http_upgrade;
+
+            add_header Access-Control-Allow-Origin "*"
+            add_header Access-Control-Allow-Methods "GET,POST,OPTIONS"
+            add_header Access-Control-Allow-Credentials "true"
+          }
+        }
+      }
