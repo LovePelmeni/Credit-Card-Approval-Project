@@ -107,5 +107,3 @@ NOTE:
 $ docker-compose up -d
 ```
 In case you don't want to keep cache of this image add `--no--cache` flag
-
-## Testing Application 
